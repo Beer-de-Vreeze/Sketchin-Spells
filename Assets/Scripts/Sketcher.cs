@@ -108,6 +108,11 @@ public class Sketcher : MonoBehaviour
         currentLine.useWorldSpace = true;
         lines.Add(currentLine);
         undoStack.Push(currentLine);
+
+        if (isSymmetryEnabled)
+        {
+            CreateMirroredLine();
+        }
     }
 
     private void StartNewLine()
@@ -134,12 +139,9 @@ public class Sketcher : MonoBehaviour
         if (isSymmetryEnabled)
         {
             Vector3 mirroredPos = new Vector3(-mousePos.x, mousePos.y, mousePos.z);
-            if (currentLine.positionCount > 1)
-            {
-                LineRenderer mirroredLine = lines[lines.Count - 1];
-                mirroredLine.positionCount = numClicks;
-                mirroredLine.SetPosition(numClicks - 1, mirroredPos);
-            }
+            LineRenderer mirroredLine = lines[lines.Count - 1];
+            mirroredLine.positionCount = numClicks;
+            mirroredLine.SetPosition(numClicks - 1, mirroredPos);
         }
 
         EraseOutsideCanvas();
@@ -156,19 +158,64 @@ public class Sketcher : MonoBehaviour
     {
         Vector3 worldPos = Camera.main.ScreenToWorldPoint(position);
         worldPos.z = 0;
+        List<LineRenderer> newLines = new List<LineRenderer>();
+
         foreach (var line in lines)
         {
+            bool splitOccurred = false;
+            List<Vector3> newPositions = new List<Vector3>();
+
             for (int i = 0; i < line.positionCount; i++)
             {
                 if (Vector3.Distance(line.GetPosition(i), worldPos) < width)
                 {
-                    line.SetPosition(
-                        i,
-                        new Vector3(float.MaxValue, float.MaxValue, float.MaxValue)
-                    );
+                    if (newPositions.Count > 0)
+                    {
+                        CreateNewLineFromPositions(newPositions);
+                        newPositions.Clear();
+                    }
+                    splitOccurred = true;
+                }
+                else
+                {
+                    newPositions.Add(line.GetPosition(i));
                 }
             }
+
+            if (newPositions.Count > 0)
+            {
+                CreateNewLineFromPositions(newPositions);
+            }
+
+            if (splitOccurred)
+            {
+                Destroy(line.gameObject);
+            }
         }
+
+        lines.RemoveAll(line => line == null);
+    }
+
+    private void CreateNewLineFromPositions(List<Vector3> positions)
+    {
+        GameObject lineObject = new GameObject("Line");
+        lineObject.transform.parent = this.transform;
+        LineRenderer newLine = lineObject.AddComponent<LineRenderer>();
+        newLine.material = new Material(Shader.Find("Sprites/Default"));
+        newLine.startColor = color;
+        newLine.endColor = color;
+        newLine.startWidth = width;
+        newLine.endWidth = width;
+        newLine.positionCount = positions.Count;
+        newLine.useWorldSpace = true;
+
+        for (int i = 0; i < positions.Count; i++)
+        {
+            newLine.SetPosition(i, positions[i]);
+        }
+
+        lines.Add(newLine);
+        undoStack.Push(newLine);
     }
 
     private void EraseOutsideCanvas()
@@ -204,10 +251,9 @@ public class Sketcher : MonoBehaviour
     #region Symmetry
     private void ApplySymmetry()
     {
-        if (currentLine == null)
-            return;
+        if (currentLine == null) return;
 
-        LineRenderer mirroredLine = CreateMirroredLine();
+        LineRenderer mirroredLine = lines[lines.Count - 1];
         for (int i = 0; i < currentLine.positionCount; i++)
         {
             Vector3 originalPos = currentLine.GetPosition(i);
