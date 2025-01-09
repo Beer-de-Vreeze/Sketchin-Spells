@@ -5,6 +5,15 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
+public enum SketchType
+{
+    Enemy,
+    Spell,
+    Player,
+    Sword,
+    Test
+}
+
 public class Sketcher : MonoBehaviour
 {
     [SerializeField]
@@ -18,6 +27,13 @@ public class Sketcher : MonoBehaviour
 
     [SerializeField]
     private RenderTexture renderTexture;
+
+    [SerializeField]
+    private string sketchName = "DefaultSketch";
+
+    [SerializeField]
+    private SketchType sketchType = SketchType.Spell;
+
     private List<LineRenderer> lines = new List<LineRenderer>();
     private LineRenderer currentLine;
     private int numClicks = 0;
@@ -158,64 +174,19 @@ public class Sketcher : MonoBehaviour
     {
         Vector3 worldPos = Camera.main.ScreenToWorldPoint(position);
         worldPos.z = 0;
-        List<LineRenderer> newLines = new List<LineRenderer>();
-
         foreach (var line in lines)
         {
-            bool splitOccurred = false;
-            List<Vector3> newPositions = new List<Vector3>();
-
             for (int i = 0; i < line.positionCount; i++)
             {
                 if (Vector3.Distance(line.GetPosition(i), worldPos) < width)
                 {
-                    if (newPositions.Count > 0)
-                    {
-                        CreateNewLineFromPositions(newPositions);
-                        newPositions.Clear();
-                    }
-                    splitOccurred = true;
-                }
-                else
-                {
-                    newPositions.Add(line.GetPosition(i));
+                    line.SetPosition(
+                        i,
+                        new Vector3(float.MaxValue, float.MaxValue, float.MaxValue)
+                    );
                 }
             }
-
-            if (newPositions.Count > 0)
-            {
-                CreateNewLineFromPositions(newPositions);
-            }
-
-            if (splitOccurred)
-            {
-                Destroy(line.gameObject);
-            }
         }
-
-        lines.RemoveAll(line => line == null);
-    }
-
-    private void CreateNewLineFromPositions(List<Vector3> positions)
-    {
-        GameObject lineObject = new GameObject("Line");
-        lineObject.transform.parent = this.transform;
-        LineRenderer newLine = lineObject.AddComponent<LineRenderer>();
-        newLine.material = new Material(Shader.Find("Sprites/Default"));
-        newLine.startColor = color;
-        newLine.endColor = color;
-        newLine.startWidth = width;
-        newLine.endWidth = width;
-        newLine.positionCount = positions.Count;
-        newLine.useWorldSpace = true;
-
-        for (int i = 0; i < positions.Count; i++)
-        {
-            newLine.SetPosition(i, positions[i]);
-        }
-
-        lines.Add(newLine);
-        undoStack.Push(newLine);
     }
 
     private void EraseOutsideCanvas()
@@ -351,7 +322,21 @@ public class Sketcher : MonoBehaviour
         tex.Apply();
 
         byte[] bytes = tex.EncodeToPNG();
-        string path = Application.dataPath + "/../SavedImage.png";
+        string folderPath = Path.Combine(Application.persistentDataPath, "sketches", sketchType.ToString());
+        if (!Directory.Exists(folderPath))
+        {
+            Directory.CreateDirectory(folderPath);
+        }
+        string path = Path.Combine(folderPath, sketchName + ".png");
+
+
+        int fileIndex = 1;
+        while (File.Exists(path))
+        {
+            path = Path.Combine(folderPath, sketchName + "_" + fileIndex + ".png");
+            fileIndex++;
+        }
+
         File.WriteAllBytes(path, bytes);
         Debug.Log("Saved image to: " + path);
 
