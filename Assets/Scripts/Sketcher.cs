@@ -1,7 +1,5 @@
 using System.Collections.Generic;
 using System.IO;
-using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -40,6 +38,7 @@ public class Sketcher : MonoBehaviour
     private bool isErasing = false;
     private Stack<LineRenderer> undoStack = new Stack<LineRenderer>();
     private bool isSymmetryEnabled = false;
+
 
     #region Unity
     void Update()
