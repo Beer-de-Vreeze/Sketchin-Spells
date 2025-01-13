@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -12,7 +13,7 @@ public enum SketchType
     Test
 }
 
-public class Sketcher : MonoBehaviour
+public class Sketcher : Singleton<Sketcher>
 {
     [SerializeField]
     private Color color = Color.black;
@@ -39,6 +40,7 @@ public class Sketcher : MonoBehaviour
     private Stack<LineRenderer> undoStack = new Stack<LineRenderer>();
     private bool isSymmetryEnabled = false;
 
+    public event Action<string> OnImageSaved;
 
     #region Unity
     void Update()
@@ -339,16 +341,18 @@ public class Sketcher : MonoBehaviour
         File.WriteAllBytes(path, bytes);
         Debug.Log("Saved image to: " + path);
 
-        RenderTexture.ReleaseTemporary(tempRT);
+        OnImageSaved?.Invoke(path);
 
-        GameObject savedImage = new GameObject("SavedImage");
-        savedImage.transform.parent = this.transform;
-        Image image = savedImage.AddComponent<Image>();
-        image.sprite = Sprite.Create(
-            tex,
-            new Rect(0, 0, tex.width, tex.height),
-            new Vector2(0.5f, 0.5f)
-        );
+        RenderTexture.ReleaseTemporary(tempRT);
+    }
+    #endregion
+
+    #region UI
+    public void OpenSketcher(SketchType type, string name)
+    {
+        sketchType = type;
+        sketchName = name;
+        gameObject.SetActive(true);
     }
     #endregion
 }
