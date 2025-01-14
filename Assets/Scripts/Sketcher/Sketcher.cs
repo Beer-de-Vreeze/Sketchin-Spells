@@ -10,7 +10,10 @@ public enum SketchType
     Spell,
     Player,
     Sword,
-    Test
+    Test,
+    // To train the AI Model i swear
+    Penis,
+    Not_Penis
 }
 
 public class Sketcher : Singleton<Sketcher>

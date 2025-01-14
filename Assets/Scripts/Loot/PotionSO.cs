@@ -1,20 +1,18 @@
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "BasePotion", menuName = "Item/Potion")]
-public class PotionSO : ScriptableObject
+public class PotionSO : ItemSO
 {
-    [Header("Potion Information")]
-    public string b_potionName;
-    public string b_description;
-    public Sprite b_icon = Resources.Load<Sprite>("DefaultPotionIcon");
-
-    [Header("Potion Stats")]
-    public int b_amount;
-    public int b_cooldown;
-    public bool b_isConsumable;
-
-    public void ApplyPotionEffect(GameObject target)
+    public enum PotionType
     {
-        // Implement potion effect logic
+        Health,
+        Mana,
+    }
+    public int b_healAmount;
+
+    public override void Use()
+    {
+        base.Use();
+        Debug.Log("Potion used");
     }
 }

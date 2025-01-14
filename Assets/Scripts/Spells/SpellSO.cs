@@ -56,9 +56,9 @@ public class SpellSO : ScriptableObject
         switch (b_spellType)
         {
             case SpellType.SelfCast:
-                // Implement self cast logic
+                // Implement self cast logic	
                 break;
-            case SpellType.Targeted:
+            case SpellType.Targeted when true:
                 // Implement targeted logic
                 break;
             case SpellType.Melee:

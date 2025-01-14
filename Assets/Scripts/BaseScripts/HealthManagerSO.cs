@@ -3,7 +3,7 @@ using UnityEngine.Events;
 
 [CreateAssetMenu(
     fileName = "New Health Manager",
-    menuName = "ScriptableObjects/HealthManager",
+    menuName = "Base/HealthManager",
     order = 1
 )]
 public class HealthManagerSO : ScriptableObject

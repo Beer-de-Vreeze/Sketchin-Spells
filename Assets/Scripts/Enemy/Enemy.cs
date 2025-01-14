@@ -12,20 +12,4 @@ public class Enemy : MonoBehaviour
         m_healthManager.b_maxHealth = b_enemyData.b_maxHealthSO;
         m_healthManager.OnEnable();
     }
-
-
-    public void TakeDamage(int damage)
-    {
-        m_healthManager.TakeDamage(damage);
-    }
-
-    public void DamageOverTime(int damage, int duration)
-    {
-        m_healthManager.DamageOverTime(damage, duration);
-    }
-
-    public void Heal(int amount)
-    {
-        m_healthManager.Heal(amount);
-    }
 }
