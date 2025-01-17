@@ -1363,6 +1363,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   color: {r: 0, g: 0, b: 0, a: 1}
+  eraserColor: {r: 1, g: 0, b: 0, a: 1}
   width: 0.1
   image: {fileID: 1141409921}
   renderTexture: {fileID: 8400000, guid: d4f20825b43919e4fbaddfc7d68d6b5d, type: 2}

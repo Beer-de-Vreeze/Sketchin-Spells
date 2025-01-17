@@ -1,7 +1,5 @@
-using Unity.VisualScripting;
-using UnityEngine;
-using UnityEngine.UI;
 using System.IO;
+using UnityEngine;
 
 public enum SpellElement
 {
@@ -12,13 +10,18 @@ public enum SpellElement
     DarkMagic,
     Support
 }
+
+public enum SpellTarget
+{
+    Self,
+    Enemy,
+}
+
 public enum SpellType
 {
     Projectile,
     Melee,
     Heal,
-    SelfCast,
-    Targeted,
     Line,
     Area
 }
@@ -28,7 +31,8 @@ public enum SpellEffect
     Stunning,
     Buff,
     Debuff,
-    DOT
+    DOT,
+    None
 }
 
 [CreateAssetMenu(fileName = "BaseSpell", menuName = "Spells/Create Spell")]
@@ -37,79 +41,126 @@ public class SpellSO : ScriptableObject
     [Header("Spell Information")]
     public string b_spellName;
     public string b_description;
-    public Sprite b_icon = Resources.Load<Sprite>("DefaultSpellIcon");
+    public Sprite b_icon; //Resources.Load<Sprite>("DefaultSpellIcon");
 
     [Header("Spell Stats")]
-    public float b_damage;
+    public int b_damage;
     public int b_manaCost;
     public int b_amount;
     public int b_cooldown;
 
     [Header("Spell Type")]
     public SpellType b_spellType;
+    public SpellTarget b_spellTarget;
+    public SpellElement b_spellElement;
 
     [Header("Spell Effects")]
     public SpellEffect b_spellEffect;
 
     public void ApplySpellEffect(GameObject caster, GameObject target)
     {
+        if (b_spellTarget == SpellTarget.Self)
+        {
+            target = caster;
+        }
+
+        Enemy enemy = target.GetComponent<Enemy>();
+        HealthManagerSO healthManager = target.GetComponent<HealthManagerSO>();
+
+        // Apply spell type effects
         switch (b_spellType)
         {
-            case SpellType.SelfCast:
-                // Implement self cast logic	
-                break;
-            case SpellType.Targeted when true:
-                // Implement targeted logic
-                break;
             case SpellType.Melee:
-                // Implement melee logic
-                break;
             case SpellType.Projectile:
-                // Implement projectile logic
+                if (enemy != null)
+                {
+                    enemy.m_healthManager.TakeDamage(b_damage);
+                }
                 break;
             case SpellType.Area:
-                // Implement area effect logic
-                break;
             case SpellType.Line:
-                // Implement line effect logic
+
                 break;
             case SpellType.Heal:
-                // Implement heal logic
+                if (healthManager != null)
+                {
+                    healthManager.Heal(b_damage);
+                }
                 break;
             default:
-                // Implement default logic
                 break;
         }
 
+        // Apply spell element effects
+        switch (b_spellElement)
+        {
+            case SpellElement.Fire:
+                // Implement fire logic
+                break;
+            case SpellElement.Ice:
+                // Implement ice logic
+                break;
+            case SpellElement.Earth:
+                // Implement earth logic
+                break;
+            case SpellElement.Lightning:
+                // Implement lightning logic
+                break;
+            case SpellElement.DarkMagic:
+                // Implement dark magic logic
+                break;
+            case SpellElement.Support:
+                // Implement support logic
+                break;
+            default:
+                break;
+        }
+
+        // Apply spell effect
         switch (b_spellEffect)
         {
             case SpellEffect.Buff:
-                // Implement buff logic
+                if (healthManager != null)
+                {
+                    healthManager.Heal(b_damage);
+                }
                 break;
             case SpellEffect.Debuff:
-                // Implement debuff logic
-                break;
             case SpellEffect.Stunning:
-                // Implement stun logic
+                if (enemy != null)
+                {
+                    enemy.m_healthManager.TakeDamage(b_damage);
+                }
                 break;
             case SpellEffect.DOT:
-                // Implement DOT logic
+                if (enemy != null)
+                {
+                    enemy.m_healthManager.DamageOverTime(b_damage, b_amount);
+                }
                 break;
-            default:
-                // Implement default logic
+            case SpellEffect.None:
                 break;
         }
     }
 
     public void LoadSprite()
     {
-        string path = Path.Combine(Application.persistentDataPath, "sketches", "Spells", b_spellName + ".png");
-        if(File.Exists(path) && path != Resources.Load<Sprite>("DefaultSpellIcon").name)
+        string path = Path.Combine(
+            Application.persistentDataPath,
+            "sketches",
+            "Spells",
+            b_spellName + ".png"
+        );
+        if (File.Exists(path) && path != Resources.Load<Sprite>("DefaultSpellIcon").name)
         {
             byte[] fileData = File.ReadAllBytes(path);
             Texture2D tex = new Texture2D(2, 2);
             tex.LoadImage(fileData);
-            b_icon = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
+            b_icon = Sprite.Create(
+                tex,
+                new Rect(0, 0, tex.width, tex.height),
+                new Vector2(0.5f, 0.5f)
+            );
         }
         else
         {

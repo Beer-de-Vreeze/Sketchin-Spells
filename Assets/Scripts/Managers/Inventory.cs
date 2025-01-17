@@ -71,6 +71,11 @@ public class Inventory : Singleton<Inventory>
         b_gold += gold;
     }
 
+    public void RemoveGold(int gold)
+    {
+        b_gold -= gold;
+    }
+    
     public void EquipItem(ItemSO item)
     {
         item.Equip();
