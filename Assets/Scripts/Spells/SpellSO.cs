@@ -58,13 +58,7 @@ public class SpellSO : ScriptableObject
     public SpellEffect b_spellEffect;
 
     public void ApplySpellEffect(GameObject caster, GameObject target)
-    {
-        if (b_spellTarget == SpellTarget.Self)
-        {
-            target = caster;
-        }
-
-        Enemy enemy = target.GetComponent<Enemy>();
+    {       
         HealthManagerSO healthManager = target.GetComponent<HealthManagerSO>();
 
         // Apply spell type effects
@@ -72,9 +66,9 @@ public class SpellSO : ScriptableObject
         {
             case SpellType.Melee:
             case SpellType.Projectile:
-                if (enemy != null)
+                if (target != null)
                 {
-                    enemy.m_healthManager.TakeDamage(b_damage);
+                    healthManager.TakeDamage(b_damage);
                 }
                 break;
             case SpellType.Area:
@@ -127,15 +121,15 @@ public class SpellSO : ScriptableObject
                 break;
             case SpellEffect.Debuff:
             case SpellEffect.Stunning:
-                if (enemy != null)
+                if (target != null)
                 {
-                    enemy.m_healthManager.TakeDamage(b_damage);
+                    healthManager.TakeDamage(b_damage);
                 }
                 break;
             case SpellEffect.DOT:
-                if (enemy != null)
+                if (target != null)
                 {
-                    enemy.m_healthManager.DamageOverTime(b_damage, b_amount);
+                    healthManager.TakeDamage(b_damage);
                 }
                 break;
             case SpellEffect.None:

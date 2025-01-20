@@ -8,6 +8,7 @@ public class Enemy : MonoBehaviour
 
     void Start()
     {
+        
         m_healthManager = ScriptableObject.CreateInstance<HealthManagerSO>();
         m_healthManager.SetMaxHealth(b_enemyData.b_maxHealthSO);
         m_healthManager.OnEnable();

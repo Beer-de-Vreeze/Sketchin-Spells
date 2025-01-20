@@ -1,28 +1,58 @@
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 public class Player : MonoBehaviour
 {
     [SerializeField]
-    private HealthManagerSO m_health;
+    public HealthManagerSO m_health;
+
     [SerializeField]
-    private ManaManagerSO m_mana;
+    public ManaManagerSO b_mana;
+
     [SerializeField]
     private Enemy target;
-    private SpriteRenderer m_spriteRenderer;
+
+    private Sprite m_playerSprite;
+
+    bool m_isTurn = false;
+
     private void Start()
     {
         target = FindFirstObjectByType<Enemy>();
+        LoadSprite();
         Debug.Log(target);
     }
 
-    private void Update()
+    private void LoadSprite()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        string path = Path.Combine(
+            Application.persistentDataPath,
+            "sketches",
+            "Player",
+            "Player" + ".png"
+        );
+        if (File.Exists(path) && path != Resources.Load<Sprite>("DefaultPlayerIcon").name)
         {
-            // use createspell and then castspell
-            Debug.Log("Casting Gale");
-            Debug.Log("Target Health: " + target.m_healthManager.GetCurrentHealth());
+            byte[] fileData = File.ReadAllBytes(path);
+            Texture2D tex = new Texture2D(2, 2);
+            tex.LoadImage(fileData);
+            m_playerSprite = Sprite.Create(
+                tex,
+                new Rect(0, 0, tex.width, tex.height),
+                new Vector2(0.5f, 0.5f)
+            );
+        }
+        else
+        {
+            m_playerSprite = null;
+
+            // open the sketcher window so the player can draw a custom spell for the game
+            Sketcher.Instance.OpenSketcher(SketchType.Spell, "Player");
+            Sketcher.Instance.OnImageSaved += (path) =>
+            {
+                LoadSprite();
+            };
         }
     }
 }

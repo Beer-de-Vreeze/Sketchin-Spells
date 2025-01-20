@@ -1,28 +1,24 @@
 using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
 using System.IO;
 using System.Linq;
+using UnityEngine;
+using UnityEngine.UI;
 
 public class Spellbook : Singleton<Spellbook>
 {
     private List<SpellSO> spells = new();
 
-    
-
-    public SpellSO GetSpell(string spellName)
+    public void LoadAllSpells()
     {
-        //get the spells out of resources folder and in that flder spellSO only load the spell with the name spellName
-        SpellSO spell = Resources.LoadAll<SpellSO>("SpellSO").ToList().Find(s => s.b_spellName == spellName);
-        if (spell != null)
+        string[] spellPaths = Directory.GetFiles(
+            Application.dataPath + "/Resources/Spells",
+            "*.asset"
+        );
+        foreach (string spellPath in spellPaths)
         {
-            return spell;
-        }
-        else
-        {
-            //make a spellSO with random values and cast it to spellSO
-            Debug.LogError("Spell not found");
-            return null;
+            string spellName = Path.GetFileNameWithoutExtension(spellPath);
+            SpellSO spell = Resources.Load<SpellSO>("Spells/" + spellName);
+            spells.Add(spell);
         }
     }
 
@@ -41,6 +37,7 @@ public class Spellbook : Singleton<Spellbook>
         spell.b_spellEffect = SpellEffect.None;
         return spell;
     }
+
     public void AddSpell(SpellSO spell)
     {
         spells.Add(spell);
@@ -50,5 +47,24 @@ public class Spellbook : Singleton<Spellbook>
     {
         spells.Remove(spell);
     }
-}
 
+    public void CastSpell(string spellName, GameObject caster, GameObject target)
+    {
+        SpellSO spell = spells.FirstOrDefault(s => s.b_spellName == spellName);
+        //check who is casting the spell
+        if (caster.CompareTag("Player"))
+        {
+            Player player = caster.GetComponent<Player>();
+            if (player.b_mana.b_currentMana >= spell.b_manaCost)
+            {
+                player.b_mana.b_currentMana -= spell.b_manaCost;
+                spell.ApplySpellEffect(caster, target);
+            }
+        }
+        else if (caster.CompareTag("Enemy"))
+        {
+            Enemy enemy = caster.GetComponent<Enemy>();
+            spell.ApplySpellEffect(caster, target);
+        }
+    }
+}

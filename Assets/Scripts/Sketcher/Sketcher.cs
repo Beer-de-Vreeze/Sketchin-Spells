@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.UI;
 
+
 public enum SketchType
 {
     Enemy,
@@ -14,8 +15,10 @@ public enum SketchType
     Test,
 }
 
+
 public class Sketcher : Singleton<Sketcher>
 {
+
     [SerializeField]
     private Color color = Color.black;
 
@@ -45,10 +48,11 @@ public class Sketcher : Singleton<Sketcher>
     private bool isSymmetryEnabled = false;
     private bool isFilling = false;
 
+    // Event for when an image is saved
     public event Action<string> OnImageSaved;
 
     #region Unity
-    // Unity Update method
+
     void Update()
     {
         HandleInput();
@@ -56,7 +60,7 @@ public class Sketcher : Singleton<Sketcher>
     #endregion
 
     #region Input Handling
-    // Handle user input
+
     private void HandleInput()
     {
         if (Input.GetKeyDown(KeyCode.LeftAlt))
@@ -145,7 +149,6 @@ public class Sketcher : Singleton<Sketcher>
     #endregion
 
     #region Drawing
-    // Create a new line
     private void CreateNewLine()
     {
         GameObject lineObject = new GameObject("Line");
@@ -167,7 +170,6 @@ public class Sketcher : Singleton<Sketcher>
         }
     }
 
-    // Start drawing a new line
     private void StartNewLine()
     {
         CreateNewLine();
@@ -176,13 +178,11 @@ public class Sketcher : Singleton<Sketcher>
         currentLine.positionCount = 0;
     }
 
-    // Stop drawing the current line
     private void StopLineDraw()
     {
         currentLine = null;
     }
 
-    // Draw the line as the mouse moves
     private void DrawLine()
     {
         if (currentLine == null)
@@ -207,13 +207,11 @@ public class Sketcher : Singleton<Sketcher>
     #endregion
 
     #region Erasing
-    // Toggle the eraser mode
     public void ToggleEraser()
     {
         isErasing = !isErasing;
     }
 
-    // Erase at the specified position
     private void EraseAtPosition(Vector3 position)
     {
         foreach (var line in lines)
@@ -237,7 +235,7 @@ public class Sketcher : Singleton<Sketcher>
         }
     }
 
-    // Erase parts of the line that are outside the canvas
+
     private void EraseOutsideCanvas()
     {
         RectTransform rectTransform = image.rectTransform;
@@ -257,7 +255,7 @@ public class Sketcher : Singleton<Sketcher>
         }
     }
 
-    // Erase all lines
+
     public void EraseAllLines()
     {
         foreach (var line in lines)
@@ -276,7 +274,6 @@ public class Sketcher : Singleton<Sketcher>
     #endregion
 
     #region Symmetry
-    // Apply symmetry to the current line
     private void ApplySymmetry()
     {
         if (currentLine == null)
@@ -291,7 +288,6 @@ public class Sketcher : Singleton<Sketcher>
         }
     }
 
-    // Create a mirrored line
     private LineRenderer CreateMirroredLine()
     {
         GameObject lineObject = new GameObject("MirroredLine");
@@ -308,8 +304,6 @@ public class Sketcher : Singleton<Sketcher>
         undoStack.Push(mirroredLine);
         return mirroredLine;
     }
-
-    // Toggle symmetry mode
     private void ToggleSymmetry()
     {
         isSymmetryEnabled = !isSymmetryEnabled;
@@ -321,7 +315,6 @@ public class Sketcher : Singleton<Sketcher>
     #endregion
 
     #region Shapes
-    // Create a new line between two points
     private void CreateNewLineBetweenPoints(Vector2 start, Vector2 end)
     {
         GameObject lineObject = new GameObject("Line");
@@ -341,7 +334,6 @@ public class Sketcher : Singleton<Sketcher>
         currentLine.SetPosition(1, end);
     }
 
-    // Draw a circle
     private void Circle(Vector2 center, float radius, int numPoints)
     {
         float angle = 0;
@@ -361,7 +353,6 @@ public class Sketcher : Singleton<Sketcher>
         }
     }
 
-    // Draw a rectangle
     private void Rectangle(Vector2 center, float width, float height)
     {
         Vector2 topLeft = new Vector2(center.x - width / 2, center.y + height / 2);
@@ -477,24 +468,20 @@ public class Sketcher : Singleton<Sketcher>
     {
         isFilling = !isFilling;
     }
-
     #endregion
 
     #region Utility
-    // Check if the mouse is over the image
     private bool IsMouseOverImage()
     {
         Vector2 localMousePos = image.rectTransform.InverseTransformPoint(Input.mousePosition);
         return image.rectTransform.rect.Contains(localMousePos);
     }
 
-    // Set the drawing color
     public void SetColor(Color color)
     {
         this.color = color;
     }
 
-    // Set the line width
     public void SetWidth(float newWidth)
     {
         width = newWidth;
@@ -504,8 +491,6 @@ public class Sketcher : Singleton<Sketcher>
             currentLine.endWidth = width;
         }
     }
-
-    // Undo the last drawn line
     public void UndoLastLine()
     {
         if (undoStack.Count > 0)
@@ -516,7 +501,6 @@ public class Sketcher : Singleton<Sketcher>
         }
     }
 
-    // Save the current sketch as an image
     private void SaveImage()
     {
         RenderTexture tempRT = RenderTexture.GetTemporary(
@@ -575,7 +559,7 @@ public class Sketcher : Singleton<Sketcher>
     #endregion
 
     #region UI
-    // Open the sketcher with the specified type and name
+
     public void OpenSketcher(SketchType type, string name)
     {
         sketchType = type;
