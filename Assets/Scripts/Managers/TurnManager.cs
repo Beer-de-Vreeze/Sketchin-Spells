@@ -9,6 +9,7 @@ public class TurnManager : Singleton<TurnManager>
         Player,
         Enemy
     }
+
     private Turn currentTurn;
 
     public UnityEvent OnPlayerTurnStart = new UnityEvent();
@@ -31,7 +32,6 @@ public class TurnManager : Singleton<TurnManager>
         Debug.Log("Player Turn Started");
         Player player = GameManager.Instance.b_Player.GetComponent<Player>();
         player.m_isTurn = true;
-        player.OnTurnEnd.AddListener(() => OnPlayerTurnEnd.Invoke());
     }
 
     public void EndPlayerTurn()
@@ -44,10 +44,6 @@ public class TurnManager : Singleton<TurnManager>
     public void StartEnemyTurn()
     {
         Debug.Log("Enemy Turn Started");
-        foreach (Enemy enemy in GameManager.Instance.b_enemies)
-        {
-            enemy.b_enemyData.Attack(enemy.gameObject, GameManager.Instance.b_Player);
-        }
         OnEnemyTurnEnd.Invoke();
     }
 
@@ -57,5 +53,4 @@ public class TurnManager : Singleton<TurnManager>
         currentTurn = Turn.Player;
         OnPlayerTurnStart.Invoke();
     }
-
 }

@@ -1,9 +1,9 @@
+using System.IO;
 using Microsoft.Unity.VisualStudio.Editor;
 using UnityEngine;
-using System.IO;
 using UnityEngine.Events;
 
-[CreateAssetMenu(fileName = "BaseEnemy", menuName = "Enemies/Create Enemy")]
+[CreateAssetMenu(fileName = "BaseEnemy", menuName = "Create Enemy")]
 public class EnemySO : ScriptableObject
 {
     public string b_enemyName;
@@ -16,10 +16,12 @@ public class EnemySO : ScriptableObject
     public UnityEvent OnSpriteLoaded = new UnityEvent();
     public UnityEvent OnAttack = new UnityEvent();
 
-    private void OnEnable() {
+    private void OnEnable()
+    {
         LoadSprite();
     }
-    private void Start() 
+
+    private void Start()
     {
         m_health.b_maxHealth = b_maxHealthSO;
     }
@@ -38,7 +40,7 @@ public class EnemySO : ScriptableObject
             "Enemy",
             b_enemyName + ".png"
         );
-        if (File.Exists(path) && path != Resources.Load<Sprite>("DefaultEnemyIcon").name)
+        if (File.Exists(path))
         {
             byte[] fileData = File.ReadAllBytes(path);
             Texture2D tex = new Texture2D(2, 2);
@@ -52,19 +54,7 @@ public class EnemySO : ScriptableObject
         }
         else
         {
-            b_sketch = null;
-
-            // open the sketcher window so the player can draw a custom spell for the game
-            UiManager.Instance.OpenCloseSketchCanvas(SketchType.Enemy, b_enemyName);
-            Sketcher.Instance.OnImageSaved += (path) =>
-            {
-                LoadSprite();
-            };
-
-            if (b_sketch == null)
-            {
-                b_sketch = Resources.Load<Sprite>("DefaultEnemyIcon");
-            }
+            b_sketch = Resources.Load<Sprite>("DefaultEnemyIcon");
         }
     }
 }

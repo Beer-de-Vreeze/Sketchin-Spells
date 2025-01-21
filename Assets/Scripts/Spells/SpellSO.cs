@@ -61,12 +61,11 @@ public class SpellSO : ScriptableObject
     public SpellEffect b_spellEffect;
 
     public UnityEvent OnSpriteLoaded = new UnityEvent();
-    public UnityEvent OnSpellEffectApplied = new UnityEvent();
 
     private void OnEnable()
     {
         b_icon = Resources.Load<Sprite>("DefaultSpellIcon");
-        LoadSprite();
+        Sketcher.Instance.OnImageSaved.AddListener(LoadSprite);
     }
 
     public void ApplySpellEffect(GameObject caster, GameObject target)
@@ -147,9 +146,7 @@ public class SpellSO : ScriptableObject
                 break;
             case SpellEffect.None:
                 break;
-        }
-
-        OnSpellEffectApplied.Invoke();
+        };
     }
 
     private void AttackAnimation(GameObject caster, GameObject target)
@@ -178,19 +175,15 @@ public class SpellSO : ScriptableObject
                 new Rect(0, 0, tex.width, tex.height),
                 new Vector2(0.5f, 0.5f)
             );
-            OnSpriteLoaded.Invoke();
-        }
-        else
-        {
-            b_icon = null;
+                PlayerUI playerUI = GameManager.Instance.b_Player.GetComponent<PlayerUI>();
+                playerUI.SetSpellToButton(0,this);
 
-            // open the sketcher window so the player can draw a custom spell for the game
-            UiManager.Instance.OpenCloseSketchCanvas(SketchType.Spell, b_spellName);
-            
-            Sketcher.Instance.OnImageSaved += (path) =>
-            {
-                LoadSprite();
-            };
+            OnSpriteLoaded.Invoke();
+
+        }
+        else if (b_icon == null)
+        {
+            b_icon = Resources.Load<Sprite>("DefaultSpellIcon");
         }
     }
 }

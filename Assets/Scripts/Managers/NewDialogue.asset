@@ -9,8 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e4d218316b3b45e409fea916c34984cd, type: 3}
-  m_Name: New Health Manager
+  m_Script: {fileID: 11500000, guid: eeb7cdc3f5e9b0b4999034013ec452a3, type: 3}
+  m_Name: NewDialogue
   m_EditorClassIdentifier: 
-  b_maxHealth: 100
-  b_currentHealth: 100
+  sentences: []

@@ -44,10 +44,4 @@ public class ItemSO : ScriptableObject, CollectInteface
         Inventory.Instance.AddGold(b_value);
         Inventory.Instance.b_inventory.Remove(this);
     }
-
-
-    public void Equip()
-    {
-        Inventory.Instance.EquipedArtifact = this;
-    }
 }

@@ -9,6 +9,8 @@ public class Spellbook : Singleton<Spellbook>
 {
     private List<SpellSO> spells = new();
 
+    private List<SpellSO> spellsInRuntime = new();
+
     public UnityEvent<SpellSO, GameObject, GameObject> OnSpellCast = new UnityEvent<SpellSO, GameObject, GameObject>();
 
     public void LoadAllSpells()

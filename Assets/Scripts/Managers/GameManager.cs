@@ -3,21 +3,26 @@ using UnityEngine;
 
 public class GameManager : Singleton<GameManager>
 {     
-    public GameObject b_Player;
-    public List<Enemy> b_enemies = new List<Enemy>();
+    public Player b_Player;
+
 
     void Start()
     {
-        b_Player = GameObject.Find("Player");
+        b_Player = FindFirstObjectByType<Player>();
     }
 
-    public void AddEnemyToList(Enemy script)
+    public void DrawPlayerSketch()
     {
-        b_enemies.Add(script);
+        UIManager.Instance.OpenSketchCanvas(SketchType.Player, "Player","You");
     }
 
-    public void RemoveEnemyFromList(Enemy script)
+    public void DrawEnemySketch(EnemySO enemy)
     {
-        b_enemies.Remove(script);
+        UIManager.Instance.OpenSketchCanvas(SketchType.Enemy, enemy.name, enemy.b_description);
+    }
+
+    public void DrawSpellSketch(SpellSO spell)
+    {
+        UIManager.Instance.OpenSketchCanvas(SketchType.Spell, spell.name, spell.b_description);
     }
 }
