@@ -16,7 +16,11 @@ public class UIManager : Singleton<UIManager>
     private GameObject m_sketchCanvas;
 
     [SerializeField]
-    private GameObject m_PlayerUI;
+    private GameObject m_playerCanvas;
+    [SerializeField]
+    private GameObject DialogueCanvas;
+    [SerializeField]
+    private GameObject MenuCanvas;
 
     [SerializeField]
     private Slider m_healthSlider;
@@ -75,7 +79,7 @@ public class UIManager : Singleton<UIManager>
     #region UI Toggle
     public void OpenClosePlayerCanvas()
     {
-        m_PlayerUI.SetActive(!m_PlayerUI.activeSelf);
+        m_playerCanvas.SetActive(!m_playerCanvas.activeSelf);
     }
 
     public void GetALlSpritesRenderersOfforoOn()

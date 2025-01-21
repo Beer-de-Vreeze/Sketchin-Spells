@@ -11,6 +11,11 @@ public class GameManager : Singleton<GameManager>
         b_Player = FindFirstObjectByType<Player>();
     }
 
+    private void StartGame()
+    {
+        
+    }
+
     public void DrawPlayerSketch()
     {
         UIManager.Instance.OpenSketchCanvas(SketchType.Player, "Player","You");

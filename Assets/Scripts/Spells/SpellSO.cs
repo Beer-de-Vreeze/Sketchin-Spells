@@ -39,7 +39,7 @@ public enum SpellEffect
     None
 }
 
-[CreateAssetMenu(fileName = "BaseSpell", menuName = "Spells/Create Spell")]
+[CreateAssetMenu(fileName = "BaseSpell", menuName = "Create Spell")]
 public class SpellSO : ScriptableObject
 {
     [Header("Spell Information")]
