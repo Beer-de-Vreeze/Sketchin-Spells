@@ -1,5 +1,9 @@
+using System;
+using System.Collections;
 using System.IO;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Events;
 
 public enum SpellElement
 {
@@ -47,7 +51,6 @@ public class SpellSO : ScriptableObject
     public int b_damage;
     public int b_manaCost;
     public int b_amount;
-    public int b_cooldown;
 
     [Header("Spell Type")]
     public SpellType b_spellType;
@@ -56,6 +59,15 @@ public class SpellSO : ScriptableObject
 
     [Header("Spell Effects")]
     public SpellEffect b_spellEffect;
+
+    public UnityEvent OnSpriteLoaded = new UnityEvent();
+    public UnityEvent OnSpellEffectApplied = new UnityEvent();
+
+    private void OnEnable()
+    {
+        b_icon = Resources.Load<Sprite>("DefaultSpellIcon");
+        LoadSprite();
+    }
 
     public void ApplySpellEffect(GameObject caster, GameObject target)
     {       
@@ -68,6 +80,7 @@ public class SpellSO : ScriptableObject
             case SpellType.Projectile:
                 if (target != null)
                 {
+                    
                     healthManager.TakeDamage(b_damage);
                 }
                 break;
@@ -135,6 +148,16 @@ public class SpellSO : ScriptableObject
             case SpellEffect.None:
                 break;
         }
+
+        OnSpellEffectApplied.Invoke();
+    }
+
+    private void AttackAnimation(GameObject caster, GameObject target)
+    {
+        b_icon = Resources.Load<Sprite>(b_spellName);
+        Instantiate(b_icon);
+        Vector2.Lerp(caster.transform.position, target.transform.position, 0.5f);
+        Destroy(b_icon,0.5f);
     }
 
     public void LoadSprite()
@@ -155,13 +178,15 @@ public class SpellSO : ScriptableObject
                 new Rect(0, 0, tex.width, tex.height),
                 new Vector2(0.5f, 0.5f)
             );
+            OnSpriteLoaded.Invoke();
         }
         else
         {
             b_icon = null;
 
             // open the sketcher window so the player can draw a custom spell for the game
-            Sketcher.Instance.OpenSketcher(SketchType.Spell, b_spellName);
+            UiManager.Instance.OpenCloseSketchCanvas(SketchType.Spell, b_spellName);
+            
             Sketcher.Instance.OnImageSaved += (path) =>
             {
                 LoadSprite();

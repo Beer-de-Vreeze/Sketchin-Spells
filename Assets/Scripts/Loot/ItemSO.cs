@@ -20,7 +20,7 @@ public enum Rarity
     Legendary
 }
 
-public class ItemSO : ScriptableObject 
+public class ItemSO : ScriptableObject, CollectInteface
 { 
     public string b_itemName;
     public string b_description;
@@ -28,8 +28,6 @@ public class ItemSO : ScriptableObject
     public Rarity b_rarity;
     public Sprite b_icon;
     public int b_value;
-
-
 
     public void Collect()
     {

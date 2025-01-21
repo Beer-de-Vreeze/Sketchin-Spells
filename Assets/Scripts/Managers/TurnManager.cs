@@ -11,42 +11,51 @@ public class TurnManager : Singleton<TurnManager>
     }
     private Turn currentTurn;
 
-    public UnityEvent StartTurn = new UnityEvent();
-    public UnityEvent EndTurn = new UnityEvent();
+    public UnityEvent OnPlayerTurnStart = new UnityEvent();
+    public UnityEvent OnPlayerTurnEnd = new UnityEvent();
+    public UnityEvent OnEnemyTurnStart = new UnityEvent();
+    public UnityEvent OnEnemyTurnEnd = new UnityEvent();
 
     private void Start()
     {
-        StartTurn.AddListener(StartPlayerTurn);
-        EndTurn.AddListener(EndPlayerTurn);
-        StartTurn.AddListener(StartEnemyTurn);
-        EndTurn.AddListener(EndEnemyTurn);
+        OnPlayerTurnStart.AddListener(StartPlayerTurn);
+        OnPlayerTurnEnd.AddListener(EndPlayerTurn);
+        OnEnemyTurnStart.AddListener(StartEnemyTurn);
+        OnEnemyTurnEnd.AddListener(EndEnemyTurn);
         currentTurn = Turn.Player;
-        StartTurn.Invoke();
+        OnPlayerTurnStart.Invoke();
     }
-
 
     public void StartPlayerTurn()
     {
         Debug.Log("Player Turn Started");
+        Player player = GameManager.Instance.b_Player.GetComponent<Player>();
+        player.m_isTurn = true;
+        player.OnTurnEnd.AddListener(() => OnPlayerTurnEnd.Invoke());
     }
 
     public void EndPlayerTurn()
     {
         Debug.Log("Player Turn Ended");
         currentTurn = Turn.Enemy;
-        StartTurn.Invoke();
+        OnEnemyTurnStart.Invoke();
     }
 
     public void StartEnemyTurn()
     {
         Debug.Log("Enemy Turn Started");
+        foreach (Enemy enemy in GameManager.Instance.b_enemies)
+        {
+            enemy.b_enemyData.Attack(enemy.gameObject, GameManager.Instance.b_Player);
+        }
+        OnEnemyTurnEnd.Invoke();
     }
 
     public void EndEnemyTurn()
     {
         Debug.Log("Enemy Turn Ended");
         currentTurn = Turn.Player;
-        StartTurn.Invoke();
+        OnPlayerTurnStart.Invoke();
     }
 
 }
