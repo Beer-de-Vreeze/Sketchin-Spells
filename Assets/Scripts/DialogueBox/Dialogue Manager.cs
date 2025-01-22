@@ -4,29 +4,29 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Events; 
+using UnityEngine.Events;
 
 public class DialogueManager : Singleton<DialogueManager>
 {
     private Queue<string> sentences;
 
+    public Dialogue[] dialogues;
+
     [SerializeField]
     private TextMeshProUGUI dialogueText;
 
-    [SerializeField, Range(0.01f,1f), Tooltip("The lower the value, the faster the typing speed.")]
+    [SerializeField, Range(0.01f, 1f), Tooltip("The lower the value, the faster the typing speed.")]
     private float typingSpeed = 0.1f;
 
     [SerializeField, Range(0.5f, 5f), Tooltip("The time between messages.")]
     private float timeBetweenMessages = 1.5f;
 
-    [SerializeField, Tooltip("Dialogue to test the dialogue manager. Not USED IN THE GAME.")] 
-    private Dialogue testDialogue;
-
+    [SerializeField, Tooltip("Dialogue to test the dialogue manager. Not USED IN THE GAME.")]
     private Dialogue currentDialogue;
 
     public UnityEvent OnDialogueEnd = new UnityEvent();
 
-    void Start()
+    void OnEnable()
     {
         sentences = new Queue<string>();
     }
@@ -37,11 +37,31 @@ public class DialogueManager : Singleton<DialogueManager>
     /// </summary>
     public void StartDialogue(Dialogue dialogue)
     {
+        if (dialogue == null)
+        {
+            Debug.LogError("Dialogue is null.");
+            return;
+        }
+
+        if (dialogue.messages == null)
+        {
+            Debug.LogError("Dialogue messages are null.");
+            return;
+        }
+
         sentences.Clear();
         currentDialogue = dialogue;
-        foreach (string sentence in dialogue.messages)
+
+        foreach (string sentence in dialogue.messages.Where(m => !string.IsNullOrEmpty(m)))
         {
             sentences.Enqueue(sentence);
+        }
+
+        if (sentences.Count == 0)
+        {
+            Debug.LogWarning("No valid messages found in dialogue.");
+            EndDialogue();
+            return;
         }
 
         DisplayNextSentence();
@@ -50,13 +70,13 @@ public class DialogueManager : Singleton<DialogueManager>
     [ContextMenu("Start Dialogue")]
     private void StartDialogueFromInspector()
     {
-        if (testDialogue != null)
+        if (dialogues.Length > 0 && dialogues[0] != null)
         {
-            StartDialogue(testDialogue);
+            StartDialogue(dialogues[0]);
         }
         else
         {
-            Debug.LogWarning("No dialogue available to start.");
+            Debug.LogError("No dialogues assigned to DialogueManager.");
         }
     }
 
@@ -64,25 +84,8 @@ public class DialogueManager : Singleton<DialogueManager>
     {
         if (sentences.Count == 0)
         {
-            if (currentDialogue.messages.Length > 0)
-            {
-                Debug.Log("Displaying next message in the dialogue.");
-                currentDialogue.messages = currentDialogue.messages.Skip(1).ToArray();
-                if (currentDialogue.messages.Length > 0)
-                {
-                    StartDialogue(currentDialogue);
-                }
-                else
-                {
-                    EndDialogue();
-                    return;
-                }
-            }
-            else
-            {
-                EndDialogue();
-                return;
-            }
+            EndDialogue();
+            return;
         }
 
         string sentence = sentences.Dequeue();

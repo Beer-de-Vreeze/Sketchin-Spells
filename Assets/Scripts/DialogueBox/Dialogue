@@ -1,0 +1,28 @@
+private int currentMessageIndex = 0;  // Add this field at class level
+
+private void DisplayNextSentence()
+{
+    if (sentences.Count == 0)
+    {
+        if (currentDialogue.messages.Length > currentMessageIndex)
+        {
+            Debug.Log("Displaying next message in the dialogue.");
+            currentMessageIndex++;
+            if (currentMessageIndex < currentDialogue.messages.Length)
+            {
+                StartDialogue(currentDialogue);
+            }
+            else
+            {
+                EndDialogue();
+                return;
+            }
+        }
+        else
+        {
+            EndDialogue();
+            return;
+        }
+    }
+
+    string sentence = sentences.Dequeue();

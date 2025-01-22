@@ -49,7 +49,6 @@ public class SpellSO : ScriptableObject
     [Header("Spell Stats")]
     public int b_damage;
     public int b_manaCost;
-    public int b_amount;
 
     [Header("Spell Type")]
     public SpellType b_spellType;
@@ -64,7 +63,6 @@ public class SpellSO : ScriptableObject
     private void OnEnable()
     {
         b_icon = Resources.Load<Sprite>("DefaultSpellIcon");
-        Sketcher.Instance.OnImageSaved.AddListener(LoadSprite);
     }
 
     public void ApplySpellEffect(GameObject caster, GameObject target)
@@ -172,7 +170,6 @@ public class SpellSO : ScriptableObject
             );
                 PlayerUI playerUI = GameManager.Instance.b_Player.GetComponent<PlayerUI>();
                 playerUI.SetSpellToButton(0,this);
-
             OnSpriteLoaded.Invoke();
 
         }

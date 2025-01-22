@@ -1,33 +1,38 @@
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class GameManager : Singleton<GameManager>
-{     
+{
     public Player b_Player;
 
-
-    void Start()
+    public void StartDialogue(
+        int dialogueIndex,
+        SketchType sketchType,
+        string name,
+        string description
+    )
     {
-        b_Player = FindFirstObjectByType<Player>();
+        UIManager.Instance.ClosePlayerCanvas();
+        UIManager.Instance.OpenDialogueCanvas();
+        DialogueManager.Instance.StartDialogue(DialogueManager.Instance.dialogues[dialogueIndex]);
+        DialogueManager.Instance.OnDialogueEnd.AddListener(
+            () => UIManager.Instance.OpenSketchCanvas(sketchType, name, description)
+        );
+        DialogueManager.Instance.OnDialogueEnd.AddListener(OnDialogueEnd);
     }
 
-    private void StartGame()
+    private void OnDialogueEnd()
     {
-        
+        UIManager.Instance.CloseDialogueCanvas();
     }
 
-    public void DrawPlayerSketch()
+    public void ResetGame()
     {
-        UIManager.Instance.OpenSketchCanvas(SketchType.Player, "Player","You");
-    }
-
-    public void DrawEnemySketch(EnemySO enemy)
-    {
-        UIManager.Instance.OpenSketchCanvas(SketchType.Enemy, enemy.name, enemy.b_description);
-    }
-
-    public void DrawSpellSketch(SpellSO spell)
-    {
-        UIManager.Instance.OpenSketchCanvas(SketchType.Spell, spell.name, spell.b_description);
+        string path = Path.Combine(Application.persistentDataPath, "sketches");
+        string newPath = path + "run" + Random.Range(0, 1000000000);
+        Directory.Move(path, newPath);
+        Directory.CreateDirectory(path);
     }
 }

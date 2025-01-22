@@ -11,15 +11,11 @@ public class EnemySO : ScriptableObject
     public Sprite b_sketch;
     public int b_maxHealthSO;
     private HealthManagerSO m_health;
-    public SpellSO b_attack;
+    public SpellSO[] b_attacks;
 
     public UnityEvent OnSpriteLoaded = new UnityEvent();
     public UnityEvent OnAttack = new UnityEvent();
 
-    private void OnEnable()
-    {
-        LoadSprite();
-    }
 
     private void Start()
     {
@@ -28,7 +24,7 @@ public class EnemySO : ScriptableObject
 
     public void Attack(GameObject caster, GameObject target)
     {
-        b_attack.ApplySpellEffect(caster, target);
+        b_attacks[Random.Range(0, b_attacks.Length)].ApplySpellEffect(caster, target);
         OnAttack.Invoke();
     }
 

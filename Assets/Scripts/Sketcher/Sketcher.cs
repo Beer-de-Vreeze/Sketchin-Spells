@@ -1,26 +1,25 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Security.Cryptography;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
-
 
 public enum SketchType
 {
     Enemy,
     Spell,
     Player,
-    Sword,
+    DarkLord,
     Test,
 }
 
-
 public class Sketcher : Singleton<Sketcher>
 {
-
     [SerializeField]
     private Color color = Color.black;
 
@@ -38,6 +37,10 @@ public class Sketcher : Singleton<Sketcher>
 
     [SerializeField]
     private string sketchName = "DefaultSketch";
+
+    [SerializeField]
+    private TextMeshProUGUI sketchTitle;
+
     [SerializeField]
     private TextMeshProUGUI sketchDescription;
 
@@ -57,10 +60,39 @@ public class Sketcher : Singleton<Sketcher>
     public UnityEvent OnImageSaved;
 
     #region Unity
+
+    private void OnEnable()
+    {
+        OnImageSaved.AddListener(() =>
+        {
+            GameManager.Instance.b_Player.LoadSprite();
+        });
+        OnImageSaved.AddListener(() =>
+        {
+            foreach (var spell in UIManager.Instance.b_playerUI.spells)
+            {
+                spell.LoadSprite();
+            }
+        });
+        OnImageSaved.AddListener(() =>
+        {
+            foreach (var enemy in WaveManager.Instance.b_waves[0].b_enemies)
+            {
+                GetComponent<Enemy>().b_enemyData.LoadSprite();
+            }
+        });
+    }
+
+    private void OnDisable()
+    {
+        OnImageSaved.RemoveAllListeners();
+    }
+
     void Update()
     {
         HandleInput();
     }
+
     #endregion
 
     #region Input Handling
@@ -87,7 +119,7 @@ public class Sketcher : Singleton<Sketcher>
         {
             ToggleEraser();
         }
-        else if(Input.GetKeyDown(KeyCode.F))
+        else if (Input.GetKeyDown(KeyCode.F))
         {
             ToggleFill();
         }
@@ -103,7 +135,7 @@ public class Sketcher : Singleton<Sketcher>
                     EraseAtPosition(mousePos);
                     DrawEraserFeedback(mousePos);
                 }
-                else if(isFilling)
+                else if (isFilling)
                 {
                     Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                     Vector2 localMousePos = image.rectTransform.InverseTransformPoint(mousePos);
@@ -239,7 +271,6 @@ public class Sketcher : Singleton<Sketcher>
         }
     }
 
-
     private void EraseOutsideCanvas()
     {
         RectTransform rectTransform = image.rectTransform;
@@ -258,7 +289,6 @@ public class Sketcher : Singleton<Sketcher>
             }
         }
     }
-
 
     public void EraseAllLines()
     {
@@ -308,6 +338,7 @@ public class Sketcher : Singleton<Sketcher>
         undoStack.Push(mirroredLine);
         return mirroredLine;
     }
+
     private void ToggleSymmetry()
     {
         isSymmetryEnabled = !isSymmetryEnabled;
@@ -408,7 +439,12 @@ public class Sketcher : Singleton<Sketcher>
     private void FloodFill(Vector2 start, Color fillColor)
     {
         // Get the pixel grid based on the render texture or image
-        Texture2D tex = new Texture2D(renderTexture.width, renderTexture.height, TextureFormat.RGBA32, false);
+        Texture2D tex = new Texture2D(
+            renderTexture.width,
+            renderTexture.height,
+            TextureFormat.RGBA32,
+            false
+        );
         RenderTexture.active = renderTexture;
         tex.ReadPixels(new Rect(0, 0, renderTexture.width, renderTexture.height), 0, 0);
         tex.Apply();
@@ -434,7 +470,7 @@ public class Sketcher : Singleton<Sketcher>
             new Vector2Int(0, 1),
             new Vector2Int(0, -1),
             new Vector2Int(1, 0),
-            new Vector2Int(-1, 0)
+            new Vector2Int(-1, 0),
         };
 
         // Start BFS
@@ -495,6 +531,7 @@ public class Sketcher : Singleton<Sketcher>
             currentLine.endWidth = width;
         }
     }
+
     public void UndoLastLine()
     {
         if (undoStack.Count > 0)
@@ -560,7 +597,8 @@ public class Sketcher : Singleton<Sketcher>
 
         RenderTexture.ReleaseTemporary(tempRT);
 
-        UIManager.Instance.CloseSketcher();
+        OnImageSaved.RemoveAllListeners();
+        UIManager.Instance.CloseSketchCanvas();
     }
     #endregion
 
@@ -570,9 +608,9 @@ public class Sketcher : Singleton<Sketcher>
     {
         sketchType = type;
         sketchName = name;
+        sketchTitle.text = name;
         sketchDescription.text = description;
     }
-
 
     #endregion
 }

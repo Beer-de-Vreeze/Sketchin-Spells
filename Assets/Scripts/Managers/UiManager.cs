@@ -17,10 +17,15 @@ public class UIManager : Singleton<UIManager>
 
     [SerializeField]
     private GameObject m_playerCanvas;
+
     [SerializeField]
-    private GameObject DialogueCanvas;
+    private GameObject m_dialogueCanvas;
+
     [SerializeField]
-    private GameObject MenuCanvas;
+    private GameObject m_gameCanvas;
+
+    [SerializeField]
+    private GameObject m_menuCanvas;
 
     [SerializeField]
     private Slider m_healthSlider;
@@ -33,11 +38,7 @@ public class UIManager : Singleton<UIManager>
 
     [SerializeField]
     private TextMeshProUGUI m_manaText;
-
-    [SerializeField]
-    private TextMeshProUGUI M_goldText;
-    [System.NonSerialized]
-    public UnityEvent OnSketchCanvasOpenOrClose = new UnityEvent();
+    internal PlayerUI b_playerUI;
     #endregion
 
     #region Unity
@@ -45,10 +46,11 @@ public class UIManager : Singleton<UIManager>
     {
         m_healthManager.healthChangedEvent.AddListener(UpdateHealthBar);
         m_manaManager.b_manaChangedEvent.AddListener(UpdateManaBar);
-        Inventory.Instance.m_GoldChangedEvent.AddListener(UpdateGoldText);
         m_healthManager.healthChangedEvent.AddListener(UpdateHealthText);
         m_manaManager.b_manaChangedEvent.AddListener(UpdateManaText);
-        OnSketchCanvasOpenOrClose.AddListener(OpenClosePlayerCanvas);
+        m_healthManager.healthChangedEvent.Invoke(m_healthManager.b_currentHealth);
+        m_manaManager.b_manaChangedEvent.Invoke(m_manaManager.b_currentMana);
+        b_playerUI = FindFirstObjectByType<PlayerUI>();
     }
 
     void Start()
@@ -57,31 +59,73 @@ public class UIManager : Singleton<UIManager>
         Player player = GameManager.Instance.b_Player.GetComponent<Player>();
         player.m_health = m_healthManager;
         player.b_mana = m_manaManager;
-        m_sketchCanvas.SetActive(false);
-    }
-    #endregion
-
-    #region Sketch Canvas
-    public void OpenSketchCanvas(SketchType sketchType, string name, string description)
-    {
-        Sketcher.Instance.SetSketcher(sketchType, name, description);
-        m_sketchCanvas.SetActive(true);
-        OnSketchCanvasOpenOrClose.Invoke();
-    }
-
-    public void CloseSketcher()
-    {
-        m_sketchCanvas.SetActive(false);
-        OnSketchCanvasOpenOrClose.Invoke();
+        CloseAllCanvas();
+        OpenMenuCanvas();
     }
     #endregion
 
     #region UI Toggle
-    public void OpenClosePlayerCanvas()
+    public void OpenSketchCanvas(SketchType sketchType, string name, string description)
     {
-        m_playerCanvas.SetActive(!m_playerCanvas.activeSelf);
+        m_sketchCanvas.SetActive(true);
+        Sketcher.Instance.SetSketcher(sketchType, name, description);
     }
 
+    public void CloseSketchCanvas()
+    {
+        m_sketchCanvas.SetActive(false);
+    }
+
+    public void OpenDialogueCanvas()
+    {
+        m_dialogueCanvas.SetActive(true);
+    }
+
+    public void CloseDialogueCanvas()
+    {
+        m_dialogueCanvas.SetActive(false);
+    }
+
+    public void OpenMenuCanvas()
+    {
+        m_menuCanvas.SetActive(true);
+    }
+
+    public void CloseMenuCanvas()
+    {
+        m_menuCanvas.SetActive(false);
+    }
+
+    public void OpenPlayerCanvas()
+    {
+        m_playerCanvas.SetActive(true);
+    }
+
+    public void ClosePlayerCanvas()
+    {
+        m_playerCanvas.SetActive(false);
+    }
+
+    public void OpenGameCanvas()
+    {
+        m_gameCanvas.SetActive(true);
+    }
+
+    public void CloseGameCanvas()
+    {
+        m_gameCanvas.SetActive(false);
+    }
+
+    public void CloseAllCanvas()
+    {
+        CloseSketchCanvas();
+        CloseDialogueCanvas();
+        CloseMenuCanvas();
+        ClosePlayerCanvas();
+        CloseGameCanvas();
+    }
+
+    #endregion
     public void GetALlSpritesRenderersOfforoOn()
     {
         SpriteRenderer[] allSpriteRenderers = FindObjectsByType<SpriteRenderer>(
@@ -92,17 +136,16 @@ public class UIManager : Singleton<UIManager>
             spriteRenderer.enabled = !spriteRenderer.enabled;
         }
     }
-    #endregion
 
     #region Update
     public void UpdateHealthBar(int amount)
     {
-        m_healthSlider.value = ConvertIntToFloatDecimal(amount);
+        m_healthSlider.value = ConvertIntToFloat(amount);
     }
 
     public void UpdateManaBar(int amount)
     {
-        m_manaSlider.value = ConvertIntToFloatDecimal(amount);
+        m_manaSlider.value = ConvertIntToFloat(amount);
     }
 
     public void UpdateHealthText(int amount)
@@ -116,25 +159,20 @@ public class UIManager : Singleton<UIManager>
         //8/10
         m_manaText.text = amount.ToString() + "/" + m_manaManager.b_maxMana.ToString();
     }
-
-    public void UpdateGoldText(int amount)
-    {
-        //254G
-        M_goldText.text = amount.ToString() + "G";
-    }
     #endregion
 
     #region Utility
     public void DisplayMessage(string message)
     {
         TextMeshProUGUI messageText = Instantiate(m_healthText, m_healthText.transform.parent);
-        messageText.text = message;	
+        messageText.text = message;
         Destroy(messageText.gameObject, 2f);
     }
 
-    private float ConvertIntToFloatDecimal(int amount)
+    private float ConvertIntToFloat(int amount)
     {
-        return (float)amount / 100;
+        return (float)amount;
+        ;
     }
     #endregion
 }

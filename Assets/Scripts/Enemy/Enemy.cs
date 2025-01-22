@@ -5,9 +5,17 @@ public class Enemy : MonoBehaviour
 {
     public EnemySO b_enemyData;
     public HealthManagerSO m_healthManager;
-    public UnityEvent OnTurnStart = new UnityEvent();
-    public UnityEvent OnTurnEnd = new UnityEvent();
-    public UnityEvent OnEnemyDestroyed = new UnityEvent();
+
+    private void OnEnable() 
+    {
+        TurnManager.Instance.OnEnemyTurnStart.AddListener(OnTurnStart);
+    }
+
+    private void OnTurnStart()
+    {
+        b_enemyData.Attack(this.gameObject, GameManager.Instance.b_Player.gameObject);
+    }
+
 
     void Start()
     {
@@ -20,7 +28,6 @@ public class Enemy : MonoBehaviour
     {
         if (m_healthManager.b_currentHealth <= 0)
         {
-            OnEnemyDestroyed.Invoke();
             Destroy(gameObject);
         }
     }

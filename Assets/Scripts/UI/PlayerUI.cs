@@ -9,21 +9,40 @@ public class PlayerUI : MonoBehaviour
     [SerializeField]
     public List<Button> spellButtons = new List<Button>();
     public string[] playerSpells = new string[4];
+    [SerializeField]
+    public List<SpellSO> spells = new List<SpellSO>();
+
+    internal Button b_endTurnButton;
+
+    private void Start()
+    {
+        b_endTurnButton = GetComponentInChildren<Button>();
+        b_endTurnButton.onClick.AddListener(() =>
+        {
+            TurnManager.Instance.EndPlayerTurn();
+        });
+    }
 
 
     public void CastSpell(SpellSO spell, GameObject target)
     {
-        //check if the player has enough mana to cast the spell
-        if (GameManager.Instance.b_Player.b_mana.b_currentMana >= spell.b_manaCost)
+        if (spell != null)
         {
-            //use the mana
-            GameManager.Instance.b_Player.b_mana.UseMana(spell.b_manaCost);
-            //cast the spell
-            spell.ApplySpellEffect(GameManager.Instance.b_Player.gameObject, target);
-        }
-        else
-        {
-            Debug.Log("Not enough mana");
+            //check who is casting the spell
+            if (target.CompareTag("Player"))
+            {
+                Player player = target.GetComponent<Player>();
+                if (player.b_mana.b_currentMana >= spell.b_manaCost)
+                {
+                    player.b_mana.b_currentMana -= spell.b_manaCost;
+                    spell.ApplySpellEffect(target, this.target.gameObject);
+                }
+            }
+            else if (target.CompareTag("Enemy"))
+            {
+                Enemy enemy = target.GetComponent<Enemy>();
+                spell.ApplySpellEffect(target, this.target.gameObject);
+            }
         }
     }
 
@@ -39,7 +58,7 @@ public class PlayerUI : MonoBehaviour
         {
             CastSpell(spell, target.gameObject);
         });
-        //set the icon of the spel
+        //set the icon of the spell
         spellButtons[buttonIndex].GetComponentInChildren<Image>().sprite = spell.b_icon;
     }
 }
