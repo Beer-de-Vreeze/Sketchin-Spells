@@ -10,15 +10,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 861caf85b64fe5c40a5a4b2619f8a2df, type: 3}
-  m_Name: FireBall
+  m_Name: Heal
   m_EditorClassIdentifier: 
-  b_spellName: Fireball
-  b_description: Hurls a blazing orb at a single enemy, dealing moderate damage.
+  b_spellName: 
+  b_description: 
   b_icon: {fileID: -406359778244772294, guid: 340a9ef21483f6f4c98841a623e78192, type: 3}
-  b_damage: 3
-  b_manaCost: 2
-  b_amount: 1
+  b_damage: 0
+  b_manaCost: 0
+  b_amount: 0
   b_spellType: 0
-  b_spellTarget: 1
+  b_spellTarget: 0
   b_spellElement: 0
-  b_spellEffect: 4
+  b_spellEffect: 0
+  OnSpriteLoaded:
+    m_PersistentCalls:
+      m_Calls: []

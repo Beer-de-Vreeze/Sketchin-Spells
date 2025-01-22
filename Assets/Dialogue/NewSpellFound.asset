@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e83d7a4d0b898be4da92bb1e6ff3a1c0, type: 3}
+  m_Name: NewSpellFound
+  m_EditorClassIdentifier: 
+  messages:
+  - As you journey onward, a strange glow catches your eye.
+  - "You see a shimmering glyph etched into the ground\u2014it hums with raw magic.\n\n"
+  - This is the essence of a new spell, waiting to be shaped by your hand.
+  - "Use your sketch magic to draw the spell\u2019s symbol and unlock its power!"
+  - Will it be a fiery blaze, a protective barrier, or something entirely unique?
+    The choice is yours.

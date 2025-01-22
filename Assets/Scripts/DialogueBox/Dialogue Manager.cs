@@ -111,6 +111,7 @@ public class DialogueManager : Singleton<DialogueManager>
     private void EndDialogue()
     {
         OnDialogueEnd.Invoke();
+        OnDialogueEnd.RemoveAllListeners();
         Debug.Log("End of conversation.");
     }
 }

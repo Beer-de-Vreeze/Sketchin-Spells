@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e83d7a4d0b898be4da92bb1e6ff3a1c0, type: 3}
+  m_Name: NewSwordFound
+  m_EditorClassIdentifier: 
+  messages:
+  - "The enemy lunges at you! You can\u2019t fight back unarmed!"
+  - '"Quickly, use your sketch magic to draw a sword!"'
+  - "\"The shape, size, and style are yours to decide\u2014just make it sharp enough
+    to defend yourself!\""
+  - '"Once your sword is ready, stand your ground and prepare to strike!"'

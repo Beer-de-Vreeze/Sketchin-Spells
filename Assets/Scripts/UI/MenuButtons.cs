@@ -4,8 +4,7 @@ public class MenuButtons : MonoBehaviour
 {
     public void StartGame()
     {
-     UIManager.Instance.DisplayMessage("Welcome Young Adventurer");
-
+     
     }
 
 

@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e83d7a4d0b898be4da92bb1e6ff3a1c0, type: 3}
+  m_Name: NewEnemyFound
+  m_EditorClassIdentifier: 
+  messages:
+  - "Hold on, brave hero\u2014something stirs ahead."
+  - "An enemy blocks your path! It\u2019s...wait, it\u2019s still taking form?"
+  - "This creature seems to emerge from the chaos of the Dark Lord\u2019s magic."
+  - You must use your sketch magic to define its shape. Draw the enemy you face!
+  - "Once you\u2019ve created it, prepare yourself\u2014your fight begins now!"

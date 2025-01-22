@@ -5,20 +5,20 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
 
-public enum SpellElement
-{
-    Fire,
-    Ice,
-    Earth,
-    Lightning,
-    DarkMagic,
-    Support
-}
+// public enum SpellElement
+// {
+//     Fire,
+//     Ice,
+//     Earth,
+//     Lightning,
+//     DarkMagic,
+//     Support
+// }
 
 public enum SpellTarget
 {
     Self,
-    Enemy,
+    Target,
 }
 
 public enum SpellType
@@ -26,18 +26,17 @@ public enum SpellType
     Projectile,
     Melee,
     Heal,
-    Line,
-    Area
+    Shield
 }
 
-public enum SpellEffect
-{
-    Stunning,
-    Buff,
-    Debuff,
-    DOT,
-    None
-}
+// public enum SpellEffect
+// {
+//     Stunning,
+//     Buff,
+//     Debuff,
+//     DOT,
+//     None
+// }
 
 [CreateAssetMenu(fileName = "BaseSpell", menuName = "Create Spell")]
 public class SpellSO : ScriptableObject
@@ -55,10 +54,10 @@ public class SpellSO : ScriptableObject
     [Header("Spell Type")]
     public SpellType b_spellType;
     public SpellTarget b_spellTarget;
-    public SpellElement b_spellElement;
+    // public SpellElement b_spellElement;
 
-    [Header("Spell Effects")]
-    public SpellEffect b_spellEffect;
+    // [Header("Spell Effects")]
+    // public SpellEffect b_spellEffect;
 
     public UnityEvent OnSpriteLoaded = new UnityEvent();
 
@@ -83,10 +82,6 @@ public class SpellSO : ScriptableObject
                     healthManager.TakeDamage(b_damage);
                 }
                 break;
-            case SpellType.Area:
-            case SpellType.Line:
-
-                break;
             case SpellType.Heal:
                 if (healthManager != null)
                 {
@@ -97,56 +92,56 @@ public class SpellSO : ScriptableObject
                 break;
         }
 
-        // Apply spell element effects
-        switch (b_spellElement)
-        {
-            case SpellElement.Fire:
-                // Implement fire logic
-                break;
-            case SpellElement.Ice:
-                // Implement ice logic
-                break;
-            case SpellElement.Earth:
-                // Implement earth logic
-                break;
-            case SpellElement.Lightning:
-                // Implement lightning logic
-                break;
-            case SpellElement.DarkMagic:
-                // Implement dark magic logic
-                break;
-            case SpellElement.Support:
-                // Implement support logic
-                break;
-            default:
-                break;
-        }
+        // // Apply spell element effects
+        // switch (b_spellElement)
+        // {
+        //     case SpellElement.Fire:
+        //         // Implement fire logic
+        //         break;
+        //     case SpellElement.Ice:
+        //         // Implement ice logic
+        //         break;
+        //     case SpellElement.Earth:
+        //         // Implement earth logic
+        //         break;
+        //     case SpellElement.Lightning:
+        //         // Implement lightning logic
+        //         break;
+        //     case SpellElement.DarkMagic:
+        //         // Implement dark magic logic
+        //         break;
+        //     case SpellElement.Support:
+        //         // Implement support logic
+        //         break;
+        //     default:
+        //         break;
+        // }
 
-        // Apply spell effect
-        switch (b_spellEffect)
-        {
-            case SpellEffect.Buff:
-                if (healthManager != null)
-                {
-                    healthManager.Heal(b_damage);
-                }
-                break;
-            case SpellEffect.Debuff:
-            case SpellEffect.Stunning:
-                if (target != null)
-                {
-                    healthManager.TakeDamage(b_damage);
-                }
-                break;
-            case SpellEffect.DOT:
-                if (target != null)
-                {
-                    healthManager.TakeDamage(b_damage);
-                }
-                break;
-            case SpellEffect.None:
-                break;
-        };
+        // // Apply spell effect
+        // switch (b_spellEffect)
+        // {
+        //     case SpellEffect.Buff:
+        //         if (healthManager != null)
+        //         {
+        //             healthManager.Heal(b_damage);
+        //         }
+        //         break;
+        //     case SpellEffect.Debuff:
+        //     case SpellEffect.Stunning:
+        //         if (target != null)
+        //         {
+        //             healthManager.TakeDamage(b_damage);
+        //         }
+        //         break;
+        //     case SpellEffect.DOT:
+        //         if (target != null)
+        //         {
+        //             healthManager.TakeDamage(b_damage);
+        //         }
+        //         break;
+        //     case SpellEffect.None:
+        //         break;
+        // };
     }
 
     private void AttackAnimation(GameObject caster, GameObject target)
