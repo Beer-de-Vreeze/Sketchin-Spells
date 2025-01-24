@@ -63,25 +63,35 @@ public class Sketcher : Singleton<Sketcher>
 
     private void OnEnable()
     {
+        switch (sketchType)
+        {
+            case SketchType.Enemy:
         OnImageSaved.AddListener(() =>
         {
             GameManager.Instance.b_Player.LoadSprite();
         });
+                break;
+            case SketchType.Spell:
+
         OnImageSaved.AddListener(() =>
         {
             foreach (var spell in UIManager.Instance.b_playerUI.spells)
             {
                 spell.LoadSprite();
             }
-        });
-        OnImageSaved.AddListener(() =>
-        {
-            foreach (var enemy in WaveManager.Instance.b_waves[0].b_enemies)
-            {
-                GetComponent<Enemy>().b_enemyData.LoadSprite();
-            }
-        });
-    }
+        });    }
+                break;
+            case SketchType.Player:
+                OnImageSaved.AddListener(() =>
+                {
+                    GameManager.Instance.b_Player.LoadSprite();
+                });
+                break;
+            case SketchType.DarkLord:
+                sketchName = "DarkLordSketch";
+                break;
+        }
+
 
     private void OnDisable()
     {

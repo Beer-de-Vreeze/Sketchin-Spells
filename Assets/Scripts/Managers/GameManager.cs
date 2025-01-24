@@ -7,6 +7,13 @@ public class GameManager : Singleton<GameManager>
 {
     public Player b_Player;
 
+    private int m_run = 1;
+
+    private void Start()
+    {
+        PlayerPrefs.SetInt("run", m_run);
+    }
+
     public void StartDialogue(
         int dialogueIndex,
         SketchType sketchType,
@@ -20,6 +27,9 @@ public class GameManager : Singleton<GameManager>
         DialogueManager.Instance.OnDialogueEnd.AddListener(
             () => UIManager.Instance.OpenSketchCanvas(sketchType, name, description)
         );
+        DialogueManager.Instance.OnDialogueEnd.AddListener(
+            () => UIManager.Instance.CloseGameCanvas()
+        );
         DialogueManager.Instance.OnDialogueEnd.AddListener(OnDialogueEnd);
     }
 
@@ -28,11 +38,13 @@ public class GameManager : Singleton<GameManager>
         UIManager.Instance.CloseDialogueCanvas();
     }
 
+    [ContextMenu("Reset Game")]
     public void ResetGame()
     {
         string path = Path.Combine(Application.persistentDataPath, "sketches");
-        string newPath = path + "run" + Random.Range(0, 1000000000);
+        string newPath = path + "run " + m_run;
         Directory.Move(path, newPath);
         Directory.CreateDirectory(path);
+        PlayerPrefs.SetInt("run", m_run + 1);
     }
 }
