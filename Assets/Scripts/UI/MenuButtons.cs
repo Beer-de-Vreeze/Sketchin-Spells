@@ -18,6 +18,7 @@ public class MenuButtons : MonoBehaviour
             GameManager.Instance.b_Player.b_playerName,
             GameManager.Instance.b_Player.b_playerDescription
         );
+        
     }
 
     public void QuitGame()

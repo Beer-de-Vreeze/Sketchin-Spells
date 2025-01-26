@@ -66,32 +66,31 @@ public class Sketcher : Singleton<Sketcher>
         switch (sketchType)
         {
             case SketchType.Enemy:
-        OnImageSaved.AddListener(() =>
-        {
-            GameManager.Instance.b_Player.LoadSprite();
-        });
+                OnImageSaved.AddListener(() =>
+                {
+                    UIManager.Instance.b_playerUI.target.b_enemyData.LoadSprite();
+                });
                 break;
-            case SketchType.Spell:
-
-        OnImageSaved.AddListener(() =>
-        {
-            foreach (var spell in UIManager.Instance.b_playerUI.spells)
-            {
-                spell.LoadSprite();
-            }
-        });    }
-                break;
+            // case SketchType.Spell:
+            //     OnImageSaved.AddListener(() =>
+            //     {
+            //         foreach (var spell in UIManager.Instance.b_playerUI.spells)
+            //         {
+            //             spell.LoadSprite();
+            //         }
+            //     });
+            //     break;
             case SketchType.Player:
                 OnImageSaved.AddListener(() =>
                 {
                     GameManager.Instance.b_Player.LoadSprite();
                 });
                 break;
-            case SketchType.DarkLord:
-                sketchName = "DarkLordSketch";
-                break;
+            // case SketchType.DarkLord:
+            //     sketchName = "DarkLordSketch";
+            //     break;
         }
-
+    }
 
     private void OnDisable()
     {
@@ -607,7 +606,6 @@ public class Sketcher : Singleton<Sketcher>
 
         RenderTexture.ReleaseTemporary(tempRT);
 
-        OnImageSaved.RemoveAllListeners();
         UIManager.Instance.CloseSketchCanvas();
     }
     #endregion
