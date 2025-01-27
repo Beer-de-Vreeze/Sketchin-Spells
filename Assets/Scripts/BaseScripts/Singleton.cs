@@ -5,22 +5,22 @@ using UnityEngine;
 public class Singleton<T> : MonoBehaviour
     where T : Component
 {
-    private static T m_instance;
+    private static T _instance;
     public static T Instance
     {
         get
         {
-            if (m_instance == null)
+            if (_instance == null)
             {
-                m_instance = FindFirstObjectByType<T>();
-                if (m_instance == null)
+                _instance = FindFirstObjectByType<T>();
+                if (_instance == null)
                 {
                     GameObject obj = new GameObject();
                     obj.name = typeof(T).Name;
-                    m_instance = obj.AddComponent<T>();
+                    _instance = obj.AddComponent<T>();
                 }
             }
-            return m_instance;
+            return _instance;
         }
     }
 }

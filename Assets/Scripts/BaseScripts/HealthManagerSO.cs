@@ -2,21 +2,18 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
 
-[CreateAssetMenu(
-    fileName = "New Health Manager",
-    menuName = "Base/New HealthManager",
-    order = 1
-)]
+[CreateAssetMenu(fileName = "New Health Manager", menuName = "Base/New HealthManager", order = 1)]
 public class HealthManagerSO : ScriptableObject
 {
-    
-    public int b_maxHealth = 100;
-    public int b_currentHealth = 100;
+    public int MaxHealth = 100;
+    public int CurrentHealth = 100;
+
     [System.NonSerialized]
     public UnityEvent<int> healthChangedEvent;
+
     public void OnEnable()
     {
-        b_currentHealth = b_maxHealth;
+        CurrentHealth = MaxHealth;
         if (healthChangedEvent == null)
         {
             healthChangedEvent = new UnityEvent<int>();
@@ -25,9 +22,9 @@ public class HealthManagerSO : ScriptableObject
 
     public void TakeDamage(int damage)
     {
-        b_currentHealth -= damage;
-        healthChangedEvent.Invoke(b_currentHealth);
-        Debug.Log("Health: " + b_currentHealth);
+        CurrentHealth -= damage;
+        healthChangedEvent.Invoke(CurrentHealth);
+        Debug.Log("Health: " + CurrentHealth + name);
     }
 
     public void DamageOverTime(int damage, int duration)
@@ -37,25 +34,30 @@ public class HealthManagerSO : ScriptableObject
             TakeDamage(damage);
         }
     }
-    
 
     public void Heal(int amount)
     {
-        b_currentHealth += amount;
-        if (b_currentHealth > b_maxHealth)
+        CurrentHealth += amount;
+        if (CurrentHealth > MaxHealth)
         {
-            b_currentHealth = b_maxHealth;
+            CurrentHealth = MaxHealth;
         }
-        healthChangedEvent.Invoke(b_currentHealth);
+        healthChangedEvent.Invoke(CurrentHealth);
     }
 
     public void SetMaxHealth(int amount)
     {
-        b_maxHealth = amount;
+        MaxHealth = amount;
     }
 
     public int GetCurrentHealth()
     {
-        return b_currentHealth;
+        return CurrentHealth;
+    }
+
+    public void Reset()
+    {
+        CurrentHealth = MaxHealth;
+        healthChangedEvent.Invoke(CurrentHealth);
     }
 }

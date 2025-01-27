@@ -8,18 +8,20 @@ using UnityEngine.Events;
 public class Player : MonoBehaviour
 {
     [SerializeField]
-    public HealthManagerSO m_health;
+    public HealthManagerSO Health;
 
     [SerializeField]
-    public ManaManagerSO b_mana;
-    private SpriteRenderer m_spriteRenderer;
+    public ManaManagerSO Mana;
+    private SpriteRenderer _spriteRenderer;
+    public UnityEvent OnPlayerDeath = new UnityEvent();
 
-    internal string b_playerName = "Player";
-    internal string b_playerDescription = "This is you";
+    internal string PlayerName = "Player";
+    internal string PlayerDescription = "This is you";
 
     private void Start()
     {
-        m_spriteRenderer = GetComponent<SpriteRenderer>();
+        _spriteRenderer = GetComponent<SpriteRenderer>();
+        Health.healthChangedEvent.AddListener(Death);
     }
 
     internal void LoadSprite()
@@ -40,8 +42,23 @@ public class Player : MonoBehaviour
                 new Rect(0, 0, tex.width, tex.height),
                 new Vector2(0, 0)
             );
-            m_spriteRenderer.sprite = sprite;
+            _spriteRenderer.sprite = sprite;
             Debug.Log("Player sprite loaded");
         }
+    }
+
+    private void Death(int health)
+    {
+        if (health <= 0)
+        {
+            OnPlayerDeath.Invoke();
+        }
+    }
+
+    public void Reset()
+    {
+        Health.Reset();
+        Mana.Reset();
+        _spriteRenderer.sprite = null;
     }
 }

@@ -2,42 +2,33 @@ using UnityEngine;
 
 public class WaveManager : Singleton<WaveManager>
 {
-    public Wave[] b_waves;
-    public int b_currentWaveIndex = 0;
-    private int m_currentEnemyIndex = 0;
+    public Wave[] Waves;
+    public int CurrentWaveIndex = 0;
 
-    public void StartNextWave()
+    public void SpawnEnemy(int waveIndex)
     {
-        if (b_currentWaveIndex < b_waves.Length)
+        if (waveIndex < Waves.Length)
         {
-            m_currentEnemyIndex = 0;
-            SpawnNextEnemy();
-        }
-        else
-        {
-            Debug.Log("All waves completed.");
+            Wave wave = Waves[waveIndex];
+            if (wave != null)
+            {
+                if (wave.Enemy != null && wave.SpawnPoint != null)
+                {
+                    Instantiate(
+                        wave.Enemy,
+                        wave.SpawnPoint.position,
+                        Quaternion.identity,
+                        parent: UIManager.Instance.GameCanvas.transform
+                    );
+                    TurnManager.Instance.SetCurrentEnemy(wave.Enemy.GetComponent<Enemy>());
+                    CurrentWaveIndex++;
+                }
+            }
         }
     }
 
-    public void SpawnNextEnemy()
+    public void ResetWaveManager()
     {
-        if (m_currentEnemyIndex < b_waves[b_currentWaveIndex].b_enemies.Count)
-        {
-            GameObject enemy = Instantiate(b_waves[b_currentWaveIndex].b_enemies.Dequeue(), b_waves[b_currentWaveIndex].b_spawnPoint.position, Quaternion.identity);
-            TurnManager.Instance.SetCurrentEnemy(enemy.GetComponent<Enemy>());
-            m_currentEnemyIndex++;
-        }
-        else
-        {
-            b_currentWaveIndex++;
-            if (b_currentWaveIndex < b_waves.Length)
-            {
-                StartNextWave();
-            }
-            else
-            {
-                TurnManager.Instance.EndBattle();
-            }
-        }
+        CurrentWaveIndex = 0;
     }
 }

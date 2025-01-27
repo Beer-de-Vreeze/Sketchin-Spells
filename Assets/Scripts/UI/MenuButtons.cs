@@ -12,17 +12,18 @@ public class MenuButtons : MonoBehaviour
 
         UIManager.Instance.CloseMenuCanvas();
         UIManager.Instance.OpenGameCanvas();
-        GameManager.Instance.StartDialogue(
-            1,
-            SketchType.Player,
-            GameManager.Instance.b_Player.b_playerName,
-            GameManager.Instance.b_Player.b_playerDescription
-        );
-        
+        GameManager.Instance.StartCoroutine(GameManager.Instance.StartGameSequence());
+    }
+
+    public void RestartGame()
+    {
+        GameManager.Instance.ResetGame();
+        StartGame();
     }
 
     public void QuitGame()
     {
+        GameManager.Instance.ResetGame();
 #if (UNITY_EDITOR || DEVELOPMENT_BUILD)
         Debug.Log(
             this.name

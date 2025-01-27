@@ -4,5 +4,5 @@ using UnityEngine;
 public class Dialogue : ScriptableObject
 {
     [TextArea(3, 10)]
-    public string[] messages;
+    public string[] Messages;
 }

@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e83d7a4d0b898be4da92bb1e6ff3a1c0, type: 3}
   m_Name: NewEnemyFound
   m_EditorClassIdentifier: 
-  messages:
+  Messages:
   - "Hold on, brave hero\u2014something stirs ahead."
   - "An enemy blocks your path! It\u2019s...wait, it\u2019s still taking form?"
   - "This creature seems to emerge from the chaos of the Dark Lord\u2019s magic."

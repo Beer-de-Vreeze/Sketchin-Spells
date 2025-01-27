@@ -8,27 +8,32 @@ using UnityEngine.Events;
 
 public class DialogueManager : Singleton<DialogueManager>
 {
-    private Queue<string> sentences;
+    private Queue<string> _sentences;
 
-    public Dialogue[] dialogues;
+    public Dialogue[] Dialogues;
 
     [SerializeField]
-    private TextMeshProUGUI dialogueText;
+    private TextMeshProUGUI _dialogueText;
 
     [SerializeField, Range(0.01f, 1f), Tooltip("The lower the value, the faster the typing speed.")]
-    private float typingSpeed = 0.1f;
+    private float _typingSpeed = 0.1f;
 
     [SerializeField, Range(0.5f, 5f), Tooltip("The time between messages.")]
-    private float timeBetweenMessages = 1.5f;
+    private float _timeBetweenMessages = 1.5f;
 
     [SerializeField, Tooltip("Dialogue to test the dialogue manager. Not USED IN THE GAME.")]
-    private Dialogue currentDialogue;
+    private Dialogue _currentDialogue;
 
     public UnityEvent OnDialogueEnd = new UnityEvent();
 
     void OnEnable()
     {
-        sentences = new Queue<string>();
+        _sentences = new Queue<string>();
+    }
+
+    private void OnDisable()
+    {
+        OnDialogueEnd.RemoveAllListeners();
     }
 
     /// <summary>
@@ -43,21 +48,21 @@ public class DialogueManager : Singleton<DialogueManager>
             return;
         }
 
-        if (dialogue.messages == null)
+        if (dialogue.Messages == null)
         {
             Debug.LogError("Dialogue messages are null.");
             return;
         }
 
-        sentences.Clear();
-        currentDialogue = dialogue;
+        _sentences.Clear();
+        _currentDialogue = dialogue;
 
-        foreach (string sentence in dialogue.messages.Where(m => !string.IsNullOrEmpty(m)))
+        foreach (string sentence in dialogue.Messages.Where(m => !string.IsNullOrEmpty(m)))
         {
-            sentences.Enqueue(sentence);
+            _sentences.Enqueue(sentence);
         }
 
-        if (sentences.Count == 0)
+        if (_sentences.Count == 0)
         {
             Debug.LogWarning("No valid messages found in dialogue.");
             EndDialogue();
@@ -70,9 +75,9 @@ public class DialogueManager : Singleton<DialogueManager>
     [ContextMenu("Start Dialogue")]
     private void StartDialogueFromInspector()
     {
-        if (dialogues.Length > 0 && dialogues[0] != null)
+        if (Dialogues.Length > 0 && Dialogues[0] != null)
         {
-            StartDialogue(dialogues[0]);
+            StartDialogue(Dialogues[0]);
         }
         else
         {
@@ -82,32 +87,32 @@ public class DialogueManager : Singleton<DialogueManager>
 
     private void DisplayNextSentence()
     {
-        if (sentences.Count == 0)
+        if (_sentences.Count == 0)
         {
             EndDialogue();
             return;
         }
 
-        string sentence = sentences.Dequeue();
+        string sentence = _sentences.Dequeue();
         StopAllCoroutines();
         StartCoroutine(TypeSentence(sentence));
     }
 
     private IEnumerator TypeSentence(string sentence)
     {
-        dialogueText.text = "";
+        _dialogueText.text = "";
         string[] lines = sentence.ToUpper().Split(new[] { '\n' }, StringSplitOptions.None);
 
         foreach (string line in lines)
         {
             foreach (char letter in line.ToCharArray())
             {
-                dialogueText.text += letter;
-                yield return new WaitForSeconds(typingSpeed);
+                _dialogueText.text += letter;
+                yield return new WaitForSeconds(_typingSpeed);
             }
-            dialogueText.text += "\n";
+            _dialogueText.text += "\n";
         }
-        yield return new WaitForSeconds(timeBetweenMessages);
+        yield return new WaitForSeconds(_timeBetweenMessages);
         DisplayNextSentence();
     }
 

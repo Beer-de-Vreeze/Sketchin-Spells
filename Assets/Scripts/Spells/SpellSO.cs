@@ -5,15 +5,15 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
 
-// public enum SpellElement
-// {
-//     Fire,
-//     Ice,
-//     Earth,
-//     Lightning,
-//     DarkMagic,
-//     Support
-// }
+public enum SpellElement
+{
+    Fire,
+    Ice,
+    Earth,
+    Lightning,
+    DarkMagic,
+    Support
+}
 
 public enum SpellTarget
 {
@@ -24,158 +24,46 @@ public enum SpellTarget
 public enum SpellType
 {
     Projectile,
-    Melee,
     Heal,
-    Shield
+    Shield,
 }
 
-// public enum SpellEffect
-// {
-//     Stunning,
-//     Buff,
-//     Debuff,
-//     DOT,
-//     None
-// }
+public enum SpellEffect
+{
+    Stunning,
+    Buff,
+    Debuff,
+    DOT,
+    None
+}
 
 [CreateAssetMenu(fileName = "BaseSpell", menuName = "Create Spell")]
 public class SpellSO : ScriptableObject
 {
     [Header("Spell Information")]
-    public string b_spellName;
-    public string b_description;
-    public Sprite b_icon; //Resources.Load<Sprite>("DefaultSpellIcon");
+    public string SpellName;
+    public string Description;
+    public Sprite Icon; //Resources.Load<Sprite>("DefaultSpellIcon");
 
     [Header("Spell Stats")]
-    public int b_damage;
-    public int b_manaCost;
+    public int Damage;
+    public int ManaCost;
 
     [Header("Spell Type")]
-    public SpellType b_spellType;
-    public SpellTarget b_spellTarget;
-    // public SpellElement b_spellElement;
+    public SpellType SpellType;
+    public SpellTarget SpellTarget;
 
-    // [Header("Spell Effects")]
-    // public SpellEffect b_spellEffect;
+    public SpellElement SpellElement;
 
+    [Header("Spell Effects")]
+    public SpellEffect SpellEffect;
+
+    [NonSerialized]
     public UnityEvent OnSpriteLoaded = new UnityEvent();
 
-    private void OnEnable()
+    public void Reset()
     {
-        b_icon = Resources.Load<Sprite>("DefaultSpellIcon");
-    }
-
-    public void ApplySpellEffect(GameObject caster, GameObject target)
-    {       
-        HealthManagerSO healthManager = target.GetComponent<HealthManagerSO>();
-
-        // Apply spell type effects
-        switch (b_spellType)
-        {
-            case SpellType.Melee:
-            case SpellType.Projectile:
-                if (target != null)
-                {
-                    
-                    healthManager.TakeDamage(b_damage);
-                }
-                break;
-            case SpellType.Heal:
-                if (healthManager != null)
-                {
-                    healthManager.Heal(b_damage);
-                }
-                break;
-            default:
-                break;
-        }
-
-        // // Apply spell element effects
-        // switch (b_spellElement)
-        // {
-        //     case SpellElement.Fire:
-        //         // Implement fire logic
-        //         break;
-        //     case SpellElement.Ice:
-        //         // Implement ice logic
-        //         break;
-        //     case SpellElement.Earth:
-        //         // Implement earth logic
-        //         break;
-        //     case SpellElement.Lightning:
-        //         // Implement lightning logic
-        //         break;
-        //     case SpellElement.DarkMagic:
-        //         // Implement dark magic logic
-        //         break;
-        //     case SpellElement.Support:
-        //         // Implement support logic
-        //         break;
-        //     default:
-        //         break;
-        // }
-
-        // // Apply spell effect
-        // switch (b_spellEffect)
-        // {
-        //     case SpellEffect.Buff:
-        //         if (healthManager != null)
-        //         {
-        //             healthManager.Heal(b_damage);
-        //         }
-        //         break;
-        //     case SpellEffect.Debuff:
-        //     case SpellEffect.Stunning:
-        //         if (target != null)
-        //         {
-        //             healthManager.TakeDamage(b_damage);
-        //         }
-        //         break;
-        //     case SpellEffect.DOT:
-        //         if (target != null)
-        //         {
-        //             healthManager.TakeDamage(b_damage);
-        //         }
-        //         break;
-        //     case SpellEffect.None:
-        //         break;
-        // };
-    }
-
-    private void AttackAnimation(GameObject caster, GameObject target)
-    {
-        b_icon = Resources.Load<Sprite>(b_spellName);
-        Instantiate(b_icon);
-        Vector2.Lerp(caster.transform.position, target.transform.position, 0.5f);
-        Destroy(b_icon,0.5f);
-    }
-
-    public void LoadSprite()
-    {
-        string path = Path.Combine(
-            Application.persistentDataPath,
-            "sketches",
-            "Spells",
-            b_spellName + ".png"
-        );
-        if (File.Exists(path) && path != Resources.Load<Sprite>("DefaultSpellIcon").name)
-        {
-            byte[] fileData = File.ReadAllBytes(path);
-            Texture2D tex = new Texture2D(2, 2);
-            tex.LoadImage(fileData);
-            b_icon = Sprite.Create(
-                tex,
-                new Rect(0, 0, tex.width, tex.height),
-                new Vector2(0.5f, 0.5f)
-            );
-                PlayerUI playerUI = GameManager.Instance.b_Player.GetComponent<PlayerUI>();
-                playerUI.SetSpellToButton(0,this);
-            OnSpriteLoaded.Invoke();
-
-        }
-        else if (b_icon == null)
-        {
-            b_icon = Resources.Load<Sprite>("DefaultSpellIcon");
-        }
+        // Reset any non-serialized fields or states here
+        OnSpriteLoaded.RemoveAllListeners();
     }
 }

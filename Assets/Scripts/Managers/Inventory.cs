@@ -1,45 +1,44 @@
+using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
-using System.Collections.Generic;
 using UnityEngine.Events;
 
 public class Inventory : Singleton<Inventory>
 {
-    public List<ItemSO> b_inventory = new();
-    public int b_gold;
-    public UnityEvent<int> m_GoldChangedEvent;
+    public List<ItemSO> PInventory = new();
+    public int Gold;
+    public UnityEvent<int> GoldChangedEvent;
 
     void Start()
     {
-        b_gold = 0;
+        Gold = 0;
     }
 
     public void AddItem(ItemSO item)
     {
-        switch (item.b_itemType)
+        switch (item.ItemType)
         {
             case ItemType.Gold:
-                AddGold(item.b_value);
+                AddGold(item.Value);
                 break;
             case ItemType.Potion:
                 AddPotion(item);
                 break;
             default:
-                b_inventory.Add(item);
+                PInventory.Add(item);
                 break;
         }
     }
 
-
     private void AddPotion(ItemSO item)
     {
-        if (b_inventory.Count >= 2)
+        if (PInventory.Count >= 2)
         {
             Debug.Log("Inventory is full");
         }
         else
         {
-            b_inventory.Add(item);
+            PInventory.Add(item);
         }
     }
 
@@ -50,13 +49,20 @@ public class Inventory : Singleton<Inventory>
 
     public void AddGold(int gold)
     {
-        b_gold += gold;
-        m_GoldChangedEvent.Invoke(b_gold);
+        Gold += gold;
+        GoldChangedEvent.Invoke(Gold);
     }
 
     public void RemoveGold(int gold)
     {
-        b_gold -= gold;
-        m_GoldChangedEvent.Invoke(b_gold);
+        Gold -= gold;
+        GoldChangedEvent.Invoke(Gold);
+    }
+
+    public void ResetInventory()
+    {
+        PInventory.Clear();
+        Gold = 0;
+        GoldChangedEvent.Invoke(Gold);
     }
 }

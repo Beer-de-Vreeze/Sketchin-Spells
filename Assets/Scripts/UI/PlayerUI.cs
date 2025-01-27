@@ -5,60 +5,53 @@ using UnityEngine.UI;
 public class PlayerUI : MonoBehaviour
 {
     [SerializeField]
-    public Enemy target;
-    [SerializeField]
-    public List<Button> spellButtons = new List<Button>();
-    public string[] playerSpells = new string[4];
-    [SerializeField]
-    public List<SpellSO> spells = new List<SpellSO>();
+    public GameObject Target;
 
-    internal Button b_endTurnButton;
+    [SerializeField]
+    public List<Button> SpellButtons = new List<Button>();
+
+    internal Button EndTurnButton;
 
     private void Start()
     {
-        b_endTurnButton = GetComponentInChildren<Button>();
-        b_endTurnButton.onClick.AddListener(() =>
+        EndTurnButton = GetComponentInChildren<Button>();
+        EndTurnButton.onClick.AddListener(() =>
         {
             TurnManager.Instance.EndPlayerTurn();
         });
     }
 
-
-    public void CastSpell(SpellSO spell, GameObject target)
+    public void CastSpell(Spell spell, GameObject target)
     {
         if (spell != null)
         {
-            //check who is casting the spell
-            if (target.CompareTag("Player"))
+            if (target != null)
             {
-                Player player = target.GetComponent<Player>();
-                if (player.b_mana.b_currentMana >= spell.b_manaCost)
+                if (target.CompareTag("Enemy"))
                 {
-                    player.b_mana.b_currentMana -= spell.b_manaCost;
-                    spell.ApplySpellEffect(target, this.target.gameObject);
+                    spell.AnimateProjectileSpell(this.gameObject, target);
                 }
-            }
-            else if (target.CompareTag("Enemy"))
-            {
-                Enemy enemy = target.GetComponent<Enemy>();
-                spell.ApplySpellEffect(target, this.target.gameObject);
+                else if (target.CompareTag("Player"))
+                {
+                    spell.AnimateHealSpell(this.gameObject, target);
+                }
             }
         }
     }
 
-    public void SetTarget(Enemy enemy)
+    public void SetTarget(GameObject target)
     {
-        target = enemy;
+        if (target != null)
+        {
+            Target = target;
+        }
     }
 
-    public void SetSpellToButton(int buttonIndex, SpellSO spell)
+    public void DisableSpellButtons()
     {
-        spellButtons[buttonIndex].GetComponentInChildren<Text>().text = spell.b_spellName;
-        spellButtons[buttonIndex].onClick.AddListener(() =>
+        foreach (Button button in SpellButtons)
         {
-            CastSpell(spell, target.gameObject);
-        });
-        //set the icon of the spell
-        spellButtons[buttonIndex].GetComponentInChildren<Image>().sprite = spell.b_icon;
+            button.interactable = false;
+        }
     }
 }

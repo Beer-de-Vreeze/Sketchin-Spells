@@ -8,7 +8,7 @@ public enum ItemType
     Spell,
     Artifact,
     Potion,
-    Gold
+    Gold,
 }
 
 public enum Rarity
@@ -17,17 +17,17 @@ public enum Rarity
     Uncommon,
     Rare,
     Epic,
-    Legendary
+    Legendary,
 }
 
 public class ItemSO : ScriptableObject, CollectInteface
-{ 
-    public string b_itemName;
-    public string b_description;
-    public ItemType b_itemType;
-    public Rarity b_rarity;
-    public Sprite b_icon;
-    public int b_value;
+{
+    public string ItemName;
+    public string Description;
+    public ItemType ItemType;
+    public Rarity Rarity;
+    public Sprite Icon;
+    public int Value;
 
     public void Collect()
     {
@@ -36,12 +36,13 @@ public class ItemSO : ScriptableObject, CollectInteface
 
     public virtual void Use()
     {
-        Debug.Log($"{b_itemName} used");
-        Inventory.Instance.b_inventory.Remove(this);
+        Debug.Log($"{ItemName} used");
+        Inventory.Instance.PInventory.Remove(this);
     }
+
     public void Sell()
     {
-        Inventory.Instance.AddGold(b_value);
-        Inventory.Instance.b_inventory.Remove(this);
+        Inventory.Instance.AddGold(Value);
+        Inventory.Instance.PInventory.Remove(this);
     }
 }

@@ -5,74 +5,142 @@ using UnityEngine.UI;
 
 public class TurnManager : Singleton<TurnManager>
 {
-    private Enemy currentEnemy;
-    private int m_ManaRegen = 2;
-    private int m_spellCount = 0;
+    public Enemy CurrentEnemy;
+    private int _manaRegen = 2;
+    private int _spellCount = 0;
 
     public UnityEvent OnPlayerTurnStart = new UnityEvent();
     public UnityEvent OnPlayerTurnEnd = new UnityEvent();
     public UnityEvent OnEnemyTurnStart = new UnityEvent();
     public UnityEvent OnEnemyTurnEnd = new UnityEvent();
-
-    private Player player;
-
-    private void OnEnable() 
-    {
-        OnPlayerTurnStart.AddListener(StartPlayerTurn);
-        OnPlayerTurnEnd.AddListener(EndPlayerTurn);
-        OnEnemyTurnStart.AddListener(StartEnemyTurn);
-        OnEnemyTurnEnd.AddListener(EndEnemyTurn);
-    }
-
-    private void Start()
-    {
-        player = GameManager.Instance.b_Player.GetComponent<Player>();
-        WaveManager.Instance.StartNextWave();
-    }
-
     public void SetCurrentEnemy(Enemy enemy)
     {
-        currentEnemy = enemy;
+        CurrentEnemy = enemy;
     }
 
     public void StartPlayerTurn()
     {
         Debug.Log("Player Turn Started");
-        foreach(Button button in UIManager.Instance.b_playerUI.spellButtons)
+        foreach (Button button in UIManager.Instance.PlayerUI.SpellButtons)
         {
-            button.interactable = true;
+            if (
+                button.GetComponent<SpellButton>().Spell.SpellData.ManaCost
+                    <= GameManager.Instance.Player.Mana.CurrentMana
+                && button.GetComponent<SpellButton>().IsUnlocked
+            )
+            {
+                button.interactable = true;
+            }
         }
-        UIManager.Instance.b_playerUI.b_endTurnButton.interactable = true;
+        UIManager.Instance.PlayerUI.EndTurnButton.interactable = true;
     }
 
     public void EndPlayerTurn()
     {
         Debug.Log("Player Turn Ended");
-        StartEnemyTurn();
-        foreach(Button button in UIManager.Instance.b_playerUI.spellButtons)
+        foreach (Button button in UIManager.Instance.PlayerUI.SpellButtons)
         {
             button.interactable = false;
         }
-        UIManager.Instance.b_playerUI.b_endTurnButton.interactable = false;
-    }
-
-    public void StartEnemyTurn()
-    {
-        OnPlayerTurnStart.Invoke();
+        UIManager.Instance.PlayerUI.EndTurnButton.interactable = false;
+        OnEnemyTurnStart.Invoke();
     }
 
     public void EndEnemyTurn()
     {
-        OnEnemyTurnEnd.Invoke();
+        Debug.Log("Enemy Turn Ended");
+        OnPlayerTurnStart.Invoke();
+        GameManager.Instance.Player.Mana.RestoreMana(_manaRegen);
+    }
+
+    private void HandleEnemyTurnEnd()
+    {
         StartPlayerTurn();
-        player.b_mana.RestoreMana(2);
+    }
+
+    public void StartBattle()
+    {
+        StartPlayerTurn();
+            OnPlayerTurnStart.AddListener(StartPlayerTurn);
+        OnPlayerTurnEnd.AddListener(EndPlayerTurn);
+        OnEnemyTurnEnd.AddListener(HandleEnemyTurnEnd); // Change listener to a new method
     }
 
     public void EndBattle()
     {
-        //make the player draw a spell using the spellSO
-        m_spellCount++;
-        player.b_mana.RestoreMana(15);
-        GameManager.Instance.StartDialogue(m_spellCount, SketchType.Player, UIManager.Instance.b_playerUI.spells[2].b_spellName, UIManager.Instance.b_playerUI.spells[2].b_description);
+        if (WaveManager.Instance.CurrentWaveIndex == 5)
+        {
+            WaveManager.Instance.SpawnEnemy(1);
+            CurrentEnemy.OnDeath.AddListener(EndGame);
+        }
+        else
+        {
+            _spellCount++;
+            GameManager.Instance.Player.Mana.RestoreMana(2);
+            GameManager.Instance.StartDialogueAndSketch(
+                4,
+                sketchType: SketchType.Spell,
+                name: UIManager
+                    .Instance.PlayerUI.SpellButtons[_spellCount]
+                    .GetComponent<SpellButton>()
+                    .Spell.SpellData.SpellName,
+                description: UIManager
+                    .Instance.PlayerUI.SpellButtons[_spellCount]
+                    .GetComponent<SpellButton>()
+                    .Spell.SpellData.Description
+            );
+            UIManager
+                .Instance.PlayerUI.SpellButtons[_spellCount]
+                .GetComponent<SpellButton>()
+                .UnlockSpell();
+            GameManager.Instance.Player.GetComponent<Player>().Health.Reset();
+        }
+    }
+
+    public void EndGame()
+    {
+        UIManager.Instance.CloseAllCanvas();
+        UIManager.Instance.CloseEndGameCanvas();
+    }
+
+    public void HandleEnemyDeath()
+    {
+        if (WaveManager.Instance.CurrentWaveIndex == 5)
+        {
+            WaveManager.Instance.SpawnEnemy(1);
+            CurrentEnemy.OnDeath.AddListener(EndBattle);
+        }
+        else
+        {
+            _spellCount++;
+            GameManager.Instance.Player.Mana.RestoreMana(2);
+            GameManager.Instance.StartDialogueAndSketch(
+                4,
+                sketchType: SketchType.Spell,
+                name: UIManager
+                    .Instance.PlayerUI.SpellButtons[_spellCount]
+                    .GetComponent<SpellButton>()
+                    .Spell.SpellData.SpellName,
+                description: UIManager
+                    .Instance.PlayerUI.SpellButtons[_spellCount]
+                    .GetComponent<SpellButton>()
+                    .Spell.SpellData.Description
+            );
+            UIManager
+                .Instance.PlayerUI.SpellButtons[_spellCount]
+                .GetComponent<SpellButton>()
+                .UnlockSpell();
+            WaveManager.Instance.SpawnEnemy(0);
+        }
+        StartBattle();
+        OnPlayerTurnStart.AddListener(StartPlayerTurn);
+        OnPlayerTurnEnd.AddListener(EndPlayerTurn);
+        OnEnemyTurnEnd.AddListener(HandleEnemyTurnEnd);
+    }
+
+    public void ResetTurnManager()
+    {
+        CurrentEnemy = null;
+        _spellCount = 0;
     }
 }

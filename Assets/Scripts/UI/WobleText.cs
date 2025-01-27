@@ -1,20 +1,21 @@
-using UnityEngine;
 using TMPro;
+using UnityEngine;
 
 public class WobleText : MonoBehaviour
 {
     [SerializeField]
-    private int m_woblines = 5;
-    private TextMeshProUGUI m_text;
+    private int _woblines = 5;
+    private TextMeshProUGUI _text;
 
-    [SerializeField] 
-    private string m_stringToWobble = "";
-    private int m_startAt;
-    private int m_endAt;
+    [SerializeField]
+    private string _stringToWobble = "";
+    private int _startAt;
+    private int _endAt;
+
 
     private void Start()
     {
-        m_text = GetComponent<TextMeshProUGUI>();
+        _text = GetComponent<TextMeshProUGUI>();
         CheckText();
     }
 
@@ -25,16 +26,16 @@ public class WobleText : MonoBehaviour
 
     private void CheckText()
     {
-        string mainText = m_text.text;
-        if (mainText.Contains(m_stringToWobble))
+        string mainText = _text.text;
+        if (mainText.Contains(_stringToWobble))
         {
-            m_startAt = mainText.IndexOf(m_stringToWobble);
-            m_endAt = m_startAt + m_stringToWobble.Length - 1;
+            _startAt = mainText.IndexOf(_stringToWobble);
+            _endAt = _startAt + _stringToWobble.Length - 1;
         }
         else
         {
-            m_startAt = 0;
-            m_endAt = m_stringToWobble.Length - 1;
+            _startAt = 0;
+            _endAt = _stringToWobble.Length - 1;
         }
     }
 
@@ -45,22 +46,26 @@ public class WobleText : MonoBehaviour
 
     private void ApplyWaveEffect()
     {
-        m_text.ForceMeshUpdate();
-        var textInfo = m_text.textInfo;
+        _text.ForceMeshUpdate();
+        var textInfo = _text.textInfo;
 
         for (int i = 0; i < textInfo.characterCount; i++)
         {
-            if (!textInfo.characterInfo[i].isVisible || !InBetween(i, m_startAt, m_endAt))
+            if (!textInfo.characterInfo[i].isVisible || !InBetween(i, _startAt, _endAt))
                 continue;
 
-            var verts = textInfo.meshInfo[textInfo.characterInfo[i].materialReferenceIndex].vertices;
+            var verts = textInfo
+                .meshInfo[textInfo.characterInfo[i].materialReferenceIndex]
+                .vertices;
             for (int j = 0; j < 4; j++)
             {
                 var orig = verts[textInfo.characterInfo[i].vertexIndex + j];
-                verts[textInfo.characterInfo[i].vertexIndex + j] = orig + new Vector3(0, Mathf.Sin(Time.time * m_woblines + orig.x * 0.01f) * 10, 0);
+                verts[textInfo.characterInfo[i].vertexIndex + j] =
+                    orig
+                    + new Vector3(0, Mathf.Sin(Time.time * _woblines + orig.x * 0.01f) * 10, 0);
             }
         }
 
-        m_text.UpdateVertexData(TMP_VertexDataUpdateFlags.Vertices);
+        _text.UpdateVertexData(TMP_VertexDataUpdateFlags.Vertices);
     }
 }

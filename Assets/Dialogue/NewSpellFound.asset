@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e83d7a4d0b898be4da92bb1e6ff3a1c0, type: 3}
   m_Name: NewSpellFound
   m_EditorClassIdentifier: 
-  messages:
-  - As you journey onward, a strange glow catches your eye.
-  - "You see a shimmering glyph etched into the ground\u2014it hums with raw magic.\n\n"
+  Messages:
+  - As the enemy falls, a strange glow fills the air.
+  - "You notice a shimmering glyph etched into the ground\u2014it hums with raw magic."
   - This is the essence of a new spell, waiting to be shaped by your hand.
   - "Use your sketch magic to draw the spell\u2019s symbol and unlock its power!"
   - Will it be a fiery blaze, a protective barrier, or something entirely unique?

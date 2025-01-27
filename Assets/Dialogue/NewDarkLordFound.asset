@@ -12,11 +12,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e83d7a4d0b898be4da92bb1e6ff3a1c0, type: 3}
   m_Name: NewDarkLordFound
   m_EditorClassIdentifier: 
-  messages:
-  - "At last, you stand before the Dark Lord\u2014his presence chills the very air."
-  - He is no mere foe, but a force of chaos itself... a being born from the void.
-  - His form twists and fluctuates, impossible to grasp... but you know what must
-    be done.
-  - Use your sketch magic, hero. Draw the Dark Lord, give shape to his nightmarish
-    essence.
-  - Once you've drawn him, ready yourself. The battle of fate begins now!
+  Messages:
+  - 'You step into the shadowed chamber, and an overwhelming sense of dread washes
+    over you.
+
+
+'
+  - At the far end of the room, a towering figure emerges from the darkness, shrouded
+    in an aura of pure malice.
+  - "It\u2019s him\u2014the Dark Lord. But his form seems... incomplete, a swirling
+    void where his true visage should be."
+  - 'He speaks, his voice echoing like thunder: ''You dare to stand before me, yet
+    you cannot even see my true face?'''
+  - '"Use your sketch magic to reveal his form, brave hero. Draw the Dark Lord as
+    you imagine him!"'
+  - 'Be warned: the shape you give him may define the battle to come. Choose wisely.'

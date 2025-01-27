@@ -21,91 +21,64 @@ public enum SketchType
 public class Sketcher : Singleton<Sketcher>
 {
     [SerializeField]
-    private Color color = Color.black;
+    private Color _color = Color.black;
 
     [SerializeField]
-    private Color eraserColor = Color.red;
+    private Color _eraserColor = Color.red;
 
     [SerializeField]
-    private float width = 1.0f;
+    private float _width = 1.0f;
 
     [SerializeField]
-    private Image image;
+    private Image _image;
 
     [SerializeField]
-    private RenderTexture renderTexture;
+    private RenderTexture RenderTexture;
 
     [SerializeField]
-    private string sketchName = "DefaultSketch";
+    private string _sketchName = "DefaultSketch";
 
     [SerializeField]
-    private TextMeshProUGUI sketchTitle;
+    private TextMeshProUGUI _sketchTitle;
 
     [SerializeField]
-    private TextMeshProUGUI sketchDescription;
+    private TextMeshProUGUI _sketchDescription;
 
     [SerializeField]
-    private SketchType sketchType = SketchType.Spell;
+    private SketchType _sketchType = SketchType.Spell;
 
-    private List<LineRenderer> lines = new List<LineRenderer>();
-    private LineRenderer currentLine;
-    private int numClicks = 0;
-    private bool isErasing = false;
-    private Stack<LineRenderer> undoStack = new Stack<LineRenderer>();
-    private bool isSymmetryEnabled = false;
-    private bool isFilling = false;
-
-    // Event for when an image is saved
-
+    private List<LineRenderer> _lines = new List<LineRenderer>();
+    private LineRenderer _currentLine;
+    private int _numClicks = 0;
+    private bool _isErasing = false;
+    private Stack<LineRenderer> _undoStack = new Stack<LineRenderer>();
+    private bool _isSymmetryEnabled = false;
+    private bool _isFilling = false;
     public UnityEvent OnImageSaved;
 
     #region Unity
-
-    private void OnEnable()
-    {
-        switch (sketchType)
-        {
-            case SketchType.Enemy:
-                OnImageSaved.AddListener(() =>
-                {
-                    UIManager.Instance.b_playerUI.target.b_enemyData.LoadSprite();
-                });
-                break;
-            // case SketchType.Spell:
-            //     OnImageSaved.AddListener(() =>
-            //     {
-            //         foreach (var spell in UIManager.Instance.b_playerUI.spells)
-            //         {
-            //             spell.LoadSprite();
-            //         }
-            //     });
-            //     break;
-            case SketchType.Player:
-                OnImageSaved.AddListener(() =>
-                {
-                    GameManager.Instance.b_Player.LoadSprite();
-                });
-                break;
-            // case SketchType.DarkLord:
-            //     sketchName = "DarkLordSketch";
-            //     break;
-        }
-    }
-
-    private void OnDisable()
-    {
-        OnImageSaved.RemoveAllListeners();
-    }
-
     void Update()
     {
         HandleInput();
     }
 
+    private void OnDisable()
+    {
+        OnImageSaved.RemoveAllListeners();
+        foreach (var line in _lines)
+        {
+            Destroy(line.gameObject);
+        }
+        _lines.Clear();
+        foreach (var line in _undoStack)
+        {
+            Destroy(line.gameObject);
+        }
+        _undoStack.Clear();
+    }
     #endregion
 
     #region Input Handling
-
     private void HandleInput()
     {
         if (Input.GetKeyDown(KeyCode.LeftAlt))
@@ -128,27 +101,17 @@ public class Sketcher : Singleton<Sketcher>
         {
             ToggleEraser();
         }
-        else if (Input.GetKeyDown(KeyCode.F))
-        {
-            ToggleFill();
-        }
         else if (Input.GetMouseButtonDown(0))
         {
             if (IsMouseOverImage())
             {
-                if (isErasing)
+                if (_isErasing)
                 {
                     Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                     mousePos.z = 0; // Ensure the eraser stays on the 2D plane
 
                     EraseAtPosition(mousePos);
                     DrawEraserFeedback(mousePos);
-                }
-                else if (isFilling)
-                {
-                    Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                    Vector2 localMousePos = image.rectTransform.InverseTransformPoint(mousePos);
-                    FloodFill(localMousePos, color);
                 }
                 else
                 {
@@ -160,7 +123,7 @@ public class Sketcher : Singleton<Sketcher>
         {
             if (IsMouseOverImage())
             {
-                if (isErasing)
+                if (_isErasing)
                 {
                     Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                     mousePos.z = 0; // Ensure the eraser stays on the 2D plane
@@ -168,15 +131,9 @@ public class Sketcher : Singleton<Sketcher>
                     EraseAtPosition(mousePos);
                     DrawEraserFeedback(mousePos);
                 }
-                else if (isFilling)
-                {
-                    Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                    Vector2 localMousePos = image.rectTransform.InverseTransformPoint(mousePos);
-                    FloodFill(localMousePos, color);
-                }
                 else
                 {
-                    if (currentLine != null)
+                    if (_currentLine != null)
                     {
                         DrawLine();
                     }
@@ -185,7 +142,7 @@ public class Sketcher : Singleton<Sketcher>
         }
         else if (Input.GetMouseButtonUp(0))
         {
-            if (!isErasing && !isFilling)
+            if (!_isErasing && !_isFilling)
             {
                 StopLineDraw();
             }
@@ -198,18 +155,18 @@ public class Sketcher : Singleton<Sketcher>
     {
         GameObject lineObject = new GameObject("Line");
         lineObject.transform.parent = this.transform;
-        currentLine = lineObject.AddComponent<LineRenderer>();
-        currentLine.material = new Material(Shader.Find("Sprites/Default"));
-        currentLine.startColor = color;
-        currentLine.endColor = color;
-        currentLine.startWidth = width;
-        currentLine.endWidth = width;
-        currentLine.positionCount = 0;
-        currentLine.useWorldSpace = true;
-        lines.Add(currentLine);
-        undoStack.Push(currentLine);
+        _currentLine = lineObject.AddComponent<LineRenderer>();
+        _currentLine.material = new Material(Shader.Find("Sprites/Default"));
+        _currentLine.startColor = _color;
+        _currentLine.endColor = _color;
+        _currentLine.startWidth = _width;
+        _currentLine.endWidth = _width;
+        _currentLine.positionCount = 0;
+        _currentLine.useWorldSpace = true;
+        _lines.Add(_currentLine);
+        _undoStack.Push(_currentLine);
 
-        if (isSymmetryEnabled)
+        if (_isSymmetryEnabled)
         {
             CreateMirroredLine();
         }
@@ -219,32 +176,32 @@ public class Sketcher : Singleton<Sketcher>
     {
         CreateNewLine();
         Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        numClicks = 0;
-        currentLine.positionCount = 0;
+        _numClicks = 0;
+        _currentLine.positionCount = 0;
     }
 
     private void StopLineDraw()
     {
-        currentLine = null;
+        _currentLine = null;
     }
 
     private void DrawLine()
     {
-        if (currentLine == null)
+        if (_currentLine == null)
             return;
 
         Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        numClicks++;
-        currentLine.positionCount = numClicks;
+        _numClicks++;
+        _currentLine.positionCount = _numClicks;
         mousePos.z = 0;
-        currentLine.SetPosition(numClicks - 1, mousePos);
+        _currentLine.SetPosition(_numClicks - 1, mousePos);
 
-        if (isSymmetryEnabled)
+        if (_isSymmetryEnabled)
         {
             Vector3 mirroredPos = new Vector3(-mousePos.x, mousePos.y, mousePos.z);
-            LineRenderer mirroredLine = lines[lines.Count - 1];
-            mirroredLine.positionCount = numClicks;
-            mirroredLine.SetPosition(numClicks - 1, mirroredPos);
+            LineRenderer mirroredLine = _lines[_lines.Count - 1];
+            mirroredLine.positionCount = _numClicks;
+            mirroredLine.SetPosition(_numClicks - 1, mirroredPos);
         }
 
         EraseOutsideCanvas();
@@ -254,21 +211,21 @@ public class Sketcher : Singleton<Sketcher>
     #region Erasing
     public void ToggleEraser()
     {
-        isErasing = !isErasing;
+        _isErasing = !_isErasing;
     }
 
     private void EraseAtPosition(Vector3 position)
     {
-        foreach (var line in lines)
+        foreach (var line in _lines)
         {
             for (int i = 0; i < line.positionCount; i++)
             {
                 // Check if the point is within the eraser's radius
-                if (Vector3.Distance(line.GetPosition(i), position) < width)
+                if (Vector3.Distance(line.GetPosition(i), position) < _width)
                 {
                     // Store the erased line for undo
                     LineRenderer erasedLine = line;
-                    undoStack.Push(erasedLine);
+                    _undoStack.Push(erasedLine);
 
                     // Remove the point by setting it to an invalid position (could also fade it, etc.)
                     line.SetPosition(
@@ -282,16 +239,16 @@ public class Sketcher : Singleton<Sketcher>
 
     private void EraseOutsideCanvas()
     {
-        RectTransform rectTransform = image.rectTransform;
-        for (int i = 0; i < currentLine.positionCount; i++)
+        RectTransform rectTransform = _image.rectTransform;
+        for (int i = 0; i < _currentLine.positionCount; i++)
         {
-            Vector3 linePos = currentLine.GetPosition(i);
+            Vector3 linePos = _currentLine.GetPosition(i);
             Vector2 localPos = rectTransform.InverseTransformPoint(
                 Camera.main.WorldToScreenPoint(linePos)
             );
             if (!rectTransform.rect.Contains(localPos))
             {
-                currentLine.SetPosition(
+                _currentLine.SetPosition(
                     i,
                     new Vector3(float.MaxValue, float.MaxValue, float.MaxValue)
                 );
@@ -301,31 +258,31 @@ public class Sketcher : Singleton<Sketcher>
 
     public void EraseAllLines()
     {
-        foreach (var line in lines)
+        foreach (var line in _lines)
         {
             Destroy(line.gameObject);
         }
-        lines.Clear();
-        undoStack.Clear();
+        _lines.Clear();
+        _undoStack.Clear();
     }
 
     private void DrawEraserFeedback(Vector3 position)
     {
-        Gizmos.color = eraserColor;
-        Gizmos.DrawWireSphere(position, width); // Visual feedback for the eraser region
+        Gizmos.color = _eraserColor;
+        Gizmos.DrawWireSphere(position, _width); // Visual feedback for the eraser region
     }
     #endregion
 
     #region Symmetry
     private void ApplySymmetry()
     {
-        if (currentLine == null)
+        if (_currentLine == null)
             return;
 
-        LineRenderer mirroredLine = lines[lines.Count - 1];
-        for (int i = 0; i < currentLine.positionCount; i++)
+        LineRenderer mirroredLine = _lines[_lines.Count - 1];
+        for (int i = 0; i < _currentLine.positionCount; i++)
         {
-            Vector3 originalPos = currentLine.GetPosition(i);
+            Vector3 originalPos = _currentLine.GetPosition(i);
             Vector3 mirroredPos = new Vector3(-originalPos.x, originalPos.y, originalPos.z);
             mirroredLine.SetPosition(i, mirroredPos);
         }
@@ -337,231 +294,146 @@ public class Sketcher : Singleton<Sketcher>
         lineObject.transform.parent = this.transform;
         LineRenderer mirroredLine = lineObject.AddComponent<LineRenderer>();
         mirroredLine.material = new Material(Shader.Find("Sprites/Default"));
-        mirroredLine.startColor = color;
-        mirroredLine.endColor = color;
-        mirroredLine.startWidth = width;
-        mirroredLine.endWidth = width;
-        mirroredLine.positionCount = currentLine.positionCount;
+        mirroredLine.startColor = _color;
+        mirroredLine.endColor = _color;
+        mirroredLine.startWidth = _width;
+        mirroredLine.endWidth = _width;
+        mirroredLine.positionCount = _currentLine.positionCount;
         mirroredLine.useWorldSpace = true;
-        lines.Add(mirroredLine);
-        undoStack.Push(mirroredLine);
+        _lines.Add(mirroredLine);
+        _undoStack.Push(mirroredLine);
         return mirroredLine;
     }
 
     private void ToggleSymmetry()
     {
-        isSymmetryEnabled = !isSymmetryEnabled;
-        if (isSymmetryEnabled)
+        _isSymmetryEnabled = !_isSymmetryEnabled;
+        if (_isSymmetryEnabled)
         {
             ApplySymmetry();
         }
     }
     #endregion
 
-    #region Shapes
-    private void CreateNewLineBetweenPoints(Vector2 start, Vector2 end)
-    {
-        GameObject lineObject = new GameObject("Line");
-        lineObject.transform.parent = this.transform;
-        currentLine = lineObject.AddComponent<LineRenderer>();
-        currentLine.material = new Material(Shader.Find("Sprites/Default"));
-        currentLine.startColor = color;
-        currentLine.endColor = color;
-        currentLine.startWidth = width;
-        currentLine.endWidth = width;
-        currentLine.positionCount = 2;
-        currentLine.useWorldSpace = true;
-        lines.Add(currentLine);
-        undoStack.Push(currentLine);
-
-        currentLine.SetPosition(0, start);
-        currentLine.SetPosition(1, end);
-    }
-
-    private void Circle(Vector2 center, float radius, int numPoints)
-    {
-        float angle = 0;
-        float angleStep = 360f / numPoints;
-        Vector2 lastPoint = Vector2.zero;
-        for (int i = 0; i < numPoints; i++)
-        {
-            float x = center.x + radius * Mathf.Cos(angle * Mathf.Deg2Rad);
-            float y = center.y + radius * Mathf.Sin(angle * Mathf.Deg2Rad);
-            Vector2 currentPoint = new Vector2(x, y);
-            if (i > 0)
-            {
-                CreateNewLineBetweenPoints(lastPoint, currentPoint);
-            }
-            lastPoint = currentPoint;
-            angle += angleStep;
-        }
-    }
-
-    private void Rectangle(Vector2 center, float width, float height)
-    {
-        Vector2 topLeft = new Vector2(center.x - width / 2, center.y + height / 2);
-        Vector2 topRight = new Vector2(center.x + width / 2, center.y + height / 2);
-        Vector2 bottomRight = new Vector2(center.x + width / 2, center.y - height / 2);
-        Vector2 bottomLeft = new Vector2(center.x - width / 2, center.y - height / 2);
-
-        CreateNewLineBetweenPoints(topLeft, topRight);
-        CreateNewLineBetweenPoints(topRight, bottomRight);
-        CreateNewLineBetweenPoints(bottomRight, bottomLeft);
-        CreateNewLineBetweenPoints(bottomLeft, topLeft);
-    }
-
-    // Draw a triangle
-    private void Triangle(Vector2 center, float width, float height)
-    {
-        Vector2 top = new Vector2(center.x, center.y + height / 2);
-        Vector2 bottomRight = new Vector2(center.x + width / 2, center.y - height / 2);
-        Vector2 bottomLeft = new Vector2(center.x - width / 2, center.y - height / 2);
-
-        CreateNewLineBetweenPoints(top, bottomRight);
-        CreateNewLineBetweenPoints(bottomRight, bottomLeft);
-        CreateNewLineBetweenPoints(bottomLeft, top);
-    }
-
-    // Draw a star
-    private void Star(Vector2 center, float radius, int numPoints)
-    {
-        float angle = 0;
-        float angleStep = 360f / numPoints;
-        Vector2 lastPoint = Vector2.zero;
-        for (int i = 0; i < numPoints; i++)
-        {
-            float x = center.x + radius * Mathf.Cos(angle * Mathf.Deg2Rad);
-            float y = center.y + radius * Mathf.Sin(angle * Mathf.Deg2Rad);
-            Vector2 currentPoint = new Vector2(x, y);
-            if (i > 0)
-            {
-                CreateNewLineBetweenPoints(lastPoint, currentPoint);
-            }
-            lastPoint = currentPoint;
-            angle += angleStep;
-        }
-    }
-    #endregion
-
     #region Filling
-    // Flood fill algorithm to fill an enclosed area (inside the drawn shape)
-    private void FloodFill(Vector2 start, Color fillColor)
-    {
-        // Get the pixel grid based on the render texture or image
-        Texture2D tex = new Texture2D(
-            renderTexture.width,
-            renderTexture.height,
-            TextureFormat.RGBA32,
-            false
-        );
-        RenderTexture.active = renderTexture;
-        tex.ReadPixels(new Rect(0, 0, renderTexture.width, renderTexture.height), 0, 0);
-        tex.Apply();
-        RenderTexture.active = null;
+    // // Flood fill algorithm to fill an enclosed area (inside the drawn shape)
+    // private void FloodFill(Vector2 start, Color fillColor)
+    // {
+    //     // Get the pixel grid based on the render texture or image
+    //     Texture2D tex = new Texture2D(
+    //         _renderTexture.width,
+    //         _renderTexture.height,
+    //         TextureFormat.RGBA32,
+    //         false
+    //     );
+    //     RenderTexture.active = _renderTexture;
+    //     tex.ReadPixels(new Rect(0, 0, _renderTexture.width, _renderTexture.height), 0, 0);
+    //     tex.Apply();
+    //     RenderTexture.active = null;
 
-        // Convert the start position to texture coordinates
-        Vector2Int startPixel = new Vector2Int((int)start.x, (int)start.y);
+    //     // Convert the start position to texture coordinates
+    //     Vector2Int startPixel = new Vector2Int((int)start.x, (int)start.y);
 
-        // Get the original color at the start point
-        Color originalColor = tex.GetPixel(startPixel.x, startPixel.y);
+    //     // Get the original color at the start point
+    //     Color originalColor = tex.GetPixel(startPixel.x, startPixel.y);
 
-        // If the starting point is already the fill color, do nothing
-        if (originalColor == fillColor)
-            return;
+    //     // If the starting point is already the fill color, do nothing
+    //     if (originalColor == fillColor)
+    //         return;
 
-        // Use a queue to implement BFS
-        Queue<Vector2Int> pixelsToFill = new Queue<Vector2Int>();
-        pixelsToFill.Enqueue(startPixel);
+    //     // Use a queue to implement BFS
+    //     Queue<Vector2Int> pixelsToFill = new Queue<Vector2Int>();
+    //     pixelsToFill.Enqueue(startPixel);
 
-        // List of possible neighbor directions (up, down, left, right)
-        Vector2Int[] directions =
-        {
-            new Vector2Int(0, 1),
-            new Vector2Int(0, -1),
-            new Vector2Int(1, 0),
-            new Vector2Int(-1, 0),
-        };
+    //     // List of possible neighbor directions (up, down, left, right)
+    //     Vector2Int[] directions =
+    //     {
+    //         new Vector2Int(0, 1),
+    //         new Vector2Int(0, -1),
+    //         new Vector2Int(1, 0),
+    //         new Vector2Int(-1, 0),
+    //     };
 
-        // Start BFS
-        while (pixelsToFill.Count > 0)
-        {
-            Vector2Int current = pixelsToFill.Dequeue();
+    //     // Start BFS
+    //     while (pixelsToFill.Count > 0)
+    //     {
+    //         Vector2Int current = pixelsToFill.Dequeue();
 
-            // Check if current pixel is out of bounds or already filled
-            if (current.x < 0 || current.x >= tex.width || current.y < 0 || current.y >= tex.height)
-                continue;
-            if (tex.GetPixel(current.x, current.y) != originalColor)
-                continue;
+    //         // Check if current pixel is out of bounds or already filled
+    //         if (current.x < 0 || current.x >= tex.width || current.y < 0 || current.y >= tex.height)
+    //             continue;
+    //         if (tex.GetPixel(current.x, current.y) != originalColor)
+    //             continue;
 
-            // Fill the current pixel with the desired color
-            tex.SetPixel(current.x, current.y, fillColor);
+    //         // Fill the current pixel with the desired color
+    //         tex.SetPixel(current.x, current.y, fillColor);
 
-            // Add neighboring pixels to the queue
-            foreach (var direction in directions)
-            {
-                Vector2Int neighbor = current + direction;
-                pixelsToFill.Enqueue(neighbor);
-            }
-        }
+    //         // Add neighboring pixels to the queue
+    //         foreach (var direction in directions)
+    //         {
+    //             Vector2Int neighbor = current + direction;
+    //             pixelsToFill.Enqueue(neighbor);
+    //         }
+    //     }
 
-        // Apply the changes to the texture
-        tex.Apply();
+    //     // Apply the changes to the texture
+    //     tex.Apply();
 
-        // Update the render texture with the filled texture
-        RenderTexture.active = renderTexture;
-        Graphics.Blit(tex, renderTexture);
-        RenderTexture.active = null;
-    }
+    //     // Update the render texture with the filled texture
+    //     RenderTexture.active = _renderTexture;
+    //     Graphics.Blit(tex, _renderTexture);
+    //     RenderTexture.active = null;
+    // }
 
-    private void ToggleFill()
-    {
-        isFilling = !isFilling;
-    }
+    // private void ToggleFill()
+    // {
+    //     _isFilling = !_isFilling;
+    // }
     #endregion
 
     #region Utility
     private bool IsMouseOverImage()
     {
-        Vector2 localMousePos = image.rectTransform.InverseTransformPoint(Input.mousePosition);
-        return image.rectTransform.rect.Contains(localMousePos);
+        Vector2 localMousePos = _image.rectTransform.InverseTransformPoint(Input.mousePosition);
+        return _image.rectTransform.rect.Contains(localMousePos);
     }
 
     public void SetColor(Color color)
     {
-        this.color = color;
+        this._color = color;
     }
 
     public void SetWidth(float newWidth)
     {
-        width = newWidth;
-        if (currentLine != null)
+        _width = newWidth;
+        if (_currentLine != null)
         {
-            currentLine.startWidth = width;
-            currentLine.endWidth = width;
+            _currentLine.startWidth = _width;
+            _currentLine.endWidth = _width;
         }
     }
 
     public void UndoLastLine()
     {
-        if (undoStack.Count > 0)
+        if (_undoStack.Count > 0)
         {
-            LineRenderer lastLine = undoStack.Pop();
+            LineRenderer lastLine = _undoStack.Pop();
             Destroy(lastLine.gameObject);
-            lines.Remove(lastLine);
+            _lines.Remove(lastLine);
         }
     }
 
     private void SaveImage()
     {
         RenderTexture tempRT = RenderTexture.GetTemporary(
-            renderTexture.width,
-            renderTexture.height,
+            RenderTexture.width,
+            RenderTexture.height,
             0,
             RenderTextureFormat.ARGB32
         );
         tempRT.antiAliasing = 8;
 
-        Graphics.Blit(renderTexture, tempRT);
+        Graphics.Blit(RenderTexture, tempRT);
 
         Texture2D tex = new Texture2D(tempRT.width, tempRT.height, TextureFormat.RGBA32, false);
         RenderTexture.active = tempRT;
@@ -584,18 +456,18 @@ public class Sketcher : Singleton<Sketcher>
         string folderPath = Path.Combine(
             Application.persistentDataPath,
             "sketches",
-            sketchType.ToString()
+            _sketchType.ToString()
         );
         if (!Directory.Exists(folderPath))
         {
             Directory.CreateDirectory(folderPath);
         }
-        string path = Path.Combine(folderPath, sketchName + ".png");
+        string path = Path.Combine(folderPath, _sketchName + ".png");
 
         int fileIndex = 1;
         while (File.Exists(path))
         {
-            path = Path.Combine(folderPath, sketchName + "_" + fileIndex + ".png");
+            path = Path.Combine(folderPath, _sketchName + "_" + fileIndex + ".png");
             fileIndex++;
         }
 
@@ -614,10 +486,10 @@ public class Sketcher : Singleton<Sketcher>
 
     public void SetSketcher(SketchType type, string name, string description)
     {
-        sketchType = type;
-        sketchName = name;
-        sketchTitle.text = name;
-        sketchDescription.text = description;
+        _sketchType = type;
+        _sketchName = name;
+        _sketchTitle.text = name;
+        _sketchDescription.text = description;
     }
 
     #endregion

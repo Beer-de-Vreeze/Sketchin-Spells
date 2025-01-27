@@ -7,58 +7,62 @@ public class UIManager : Singleton<UIManager>
 {
     #region Variables
     [SerializeField]
-    private HealthManagerSO m_healthManager;
+    private HealthManagerSO _healthManager;
 
     [SerializeField]
-    private ManaManagerSO m_manaManager;
+    private ManaManagerSO _manaManager;
 
     [SerializeField]
-    private GameObject m_sketchCanvas;
+    public GameObject _sketchCanvas;
 
     [SerializeField]
-    private GameObject m_playerCanvas;
+    private GameObject _playerCanvas;
 
     [SerializeField]
-    private GameObject m_dialogueCanvas;
+    private GameObject _dialogueCanvas;
 
     [SerializeField]
-    private GameObject m_gameCanvas;
+    internal GameObject GameCanvas;
 
     [SerializeField]
-    private GameObject m_menuCanvas;
+    private GameObject _menuCanvas;
 
     [SerializeField]
-    private Slider m_healthSlider;
+    public GameObject ENDGAMECanvas;
 
     [SerializeField]
-    private Slider m_manaSlider;
+    private Slider _healthSlider;
 
     [SerializeField]
-    private TextMeshProUGUI m_healthText;
+    private Slider _manaSlider;
 
     [SerializeField]
-    private TextMeshProUGUI m_manaText;
-    internal PlayerUI b_playerUI;
+    private TextMeshProUGUI _healthText;
+
+    [SerializeField]
+    private TextMeshProUGUI _manaText;
+    internal PlayerUI PlayerUI;
     #endregion
 
     #region Unity
     private void OnEnable()
     {
-        m_healthManager.healthChangedEvent.AddListener(UpdateHealthBar);
-        m_manaManager.b_manaChangedEvent.AddListener(UpdateManaBar);
-        m_healthManager.healthChangedEvent.AddListener(UpdateHealthText);
-        m_manaManager.b_manaChangedEvent.AddListener(UpdateManaText);
-        m_healthManager.healthChangedEvent.Invoke(m_healthManager.b_currentHealth);
-        m_manaManager.b_manaChangedEvent.Invoke(m_manaManager.b_currentMana);
-        b_playerUI = FindFirstObjectByType<PlayerUI>();
+        _healthManager.healthChangedEvent.AddListener(UpdateHealthBar);
+        _manaManager.ManaChangedEvent.AddListener(UpdateManaBar);
+        _healthManager.healthChangedEvent.AddListener(UpdateHealthText);
+        _manaManager.ManaChangedEvent.AddListener(UpdateManaText);
+        _healthManager.healthChangedEvent.Invoke(_healthManager.CurrentHealth);
+        _manaManager.ManaChangedEvent.Invoke(_manaManager.CurrentMana);
+        GameManager.Instance.Player.GetComponent<Player>().OnPlayerDeath.AddListener(ENDGAME);
+        PlayerUI = FindFirstObjectByType<PlayerUI>();
     }
 
     void Start()
     {
         //get the player health and mana from the healthSO and manaSO
-        Player player = GameManager.Instance.b_Player.GetComponent<Player>();
-        player.m_health = m_healthManager;
-        player.b_mana = m_manaManager;
+        Player player = GameManager.Instance.Player.GetComponent<Player>();
+        player.Health = _healthManager;
+        player.Mana = _manaManager;
         CloseAllCanvas();
         OpenMenuCanvas();
     }
@@ -67,53 +71,63 @@ public class UIManager : Singleton<UIManager>
     #region UI Toggle
     public void OpenSketchCanvas(SketchType sketchType, string name, string description)
     {
-        m_sketchCanvas.SetActive(true);
+        _sketchCanvas.SetActive(true);
         Sketcher.Instance.SetSketcher(sketchType, name, description);
     }
 
     public void CloseSketchCanvas()
     {
-        m_sketchCanvas.SetActive(false);
+        _sketchCanvas.SetActive(false);
     }
 
     public void OpenDialogueCanvas()
     {
-        m_dialogueCanvas.SetActive(true);
+        _dialogueCanvas.SetActive(true);
     }
 
     public void CloseDialogueCanvas()
     {
-        m_dialogueCanvas.SetActive(false);
+        _dialogueCanvas.SetActive(false);
     }
 
     public void OpenMenuCanvas()
     {
-        m_menuCanvas.SetActive(true);
+        _menuCanvas.SetActive(true);
     }
 
     public void CloseMenuCanvas()
     {
-        m_menuCanvas.SetActive(false);
+        _menuCanvas.SetActive(false);
     }
 
     public void OpenPlayerCanvas()
     {
-        m_playerCanvas.SetActive(true);
+        _playerCanvas.SetActive(true);
     }
 
     public void ClosePlayerCanvas()
     {
-        m_playerCanvas.SetActive(false);
+        _playerCanvas.SetActive(false);
     }
 
     public void OpenGameCanvas()
     {
-        m_gameCanvas.SetActive(true);
+        GameCanvas.SetActive(true);
     }
 
     public void CloseGameCanvas()
     {
-        m_gameCanvas.SetActive(false);
+        GameCanvas.SetActive(false);
+    }
+
+    public void OpenEndGameCanvas()
+    {
+        ENDGAMECanvas.SetActive(true);
+    }
+
+    public void CloseEndGameCanvas()
+    {
+        ENDGAMECanvas.SetActive(false);
     }
 
     public void CloseAllCanvas()
@@ -123,6 +137,7 @@ public class UIManager : Singleton<UIManager>
         CloseMenuCanvas();
         ClosePlayerCanvas();
         CloseGameCanvas();
+        CloseEndGameCanvas();
     }
 
     #endregion
@@ -140,31 +155,37 @@ public class UIManager : Singleton<UIManager>
     #region Update
     public void UpdateHealthBar(int amount)
     {
-        m_healthSlider.value = ConvertIntToFloat(amount);
+        _healthSlider.value = ConvertIntToFloat(amount);
     }
 
     public void UpdateManaBar(int amount)
     {
-        m_manaSlider.value = ConvertIntToFloat(amount);
+        _manaSlider.value = ConvertIntToFloat(amount);
     }
 
     public void UpdateHealthText(int amount)
     {
         //68/100
-        m_healthText.text = amount.ToString() + "/" + m_healthManager.b_maxHealth.ToString();
+        _healthText.text = amount.ToString() + "/" + _healthManager.MaxHealth.ToString();
     }
 
     public void UpdateManaText(int amount)
     {
         //8/10
-        m_manaText.text = amount.ToString() + "/" + m_manaManager.b_maxMana.ToString();
+        _manaText.text = amount.ToString() + "/" + _manaManager.MaxMana.ToString();
+    }
+
+    private void ENDGAME()
+    {
+        CloseAllCanvas();
+        OpenEndGameCanvas();
     }
     #endregion
 
     #region Utility
     public void DisplayMessage(string message)
     {
-        TextMeshProUGUI messageText = Instantiate(m_healthText, m_healthText.transform.parent);
+        TextMeshProUGUI messageText = Instantiate(_healthText, _healthText.transform.parent);
         messageText.text = message;
         Destroy(messageText.gameObject, 2f);
     }
@@ -175,4 +196,10 @@ public class UIManager : Singleton<UIManager>
         ;
     }
     #endregion
+
+    public void ResetUIManager()
+    {
+        CloseAllCanvas();
+        OpenMenuCanvas();
+    }
 }

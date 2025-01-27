@@ -4,40 +4,52 @@ using UnityEngine.Events;
 [CreateAssetMenu(fileName = "ManaManagerSO", menuName = "Base/New ManaManagerSO")]
 public class ManaManagerSO : ScriptableObject
 {
-    public int b_maxMana = 10;
-    public int b_currentMana = 10;
-    public UnityEvent<int> b_manaChangedEvent;
+    public int MaxMana = 10;
+    public int CurrentMana = 10;
+    public UnityEvent<int> ManaChangedEvent;
+
     public void OnEnable()
     {
-        b_currentMana = b_maxMana;
-        if (b_manaChangedEvent == null)
+        CurrentMana = MaxMana;
+        if (ManaChangedEvent == null)
         {
-            b_manaChangedEvent = new UnityEvent<int>();
+            ManaChangedEvent = new UnityEvent<int>();
         }
-    }   
+    }
 
     public void UseMana(int amount)
     {
-        b_currentMana -= amount;
-        if (b_currentMana < 0)
+        CurrentMana -= amount;
+        if (CurrentMana < 0)
         {
-            b_currentMana = 0;
+            CurrentMana = 0;
         }
-        b_manaChangedEvent.Invoke(b_currentMana);
+        ManaChangedEvent.Invoke(CurrentMana);
     }
 
     public void RestoreMana(int amount)
     {
-        b_currentMana += amount;
-        if (b_currentMana > b_maxMana)
+        CurrentMana += amount;
+        if (CurrentMana > MaxMana)
         {
-            b_currentMana = b_maxMana;
+            CurrentMana = MaxMana;
         }
-        b_manaChangedEvent.Invoke(b_currentMana);
+        ManaChangedEvent.Invoke(CurrentMana);
     }
 
     public void SetMaxMana(int amount)
     {
-        b_maxMana = amount;
+        MaxMana = amount;
+    }
+
+    public int GetCurrentMana()
+    {
+        return CurrentMana;
+    }
+
+    public void Reset()
+    {
+        CurrentMana = MaxMana;
+        ManaChangedEvent.Invoke(CurrentMana);
     }
 }

@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e83d7a4d0b898be4da92bb1e6ff3a1c0, type: 3}
   m_Name: NewSwordFound
   m_EditorClassIdentifier: 
-  messages:
+  Messages:
   - "The enemy lunges at you! You can\u2019t fight back unarmed!"
-  - '"Quickly, use your sketch magic to draw a sword!"'
-  - "\"The shape, size, and style are yours to decide\u2014just make it sharp enough
-    to defend yourself!\""
-  - '"Once your sword is ready, stand your ground and prepare to strike!"'
+  - Quickly, use your sketch magic to draw a sword!
+  - "The shape, size, and style are yours to decide\u2014just make it sharp enough
+    to defend yourself!"
+  - Once your sword is ready, stand your ground and prepare to strike!

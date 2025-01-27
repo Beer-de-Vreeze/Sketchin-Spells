@@ -1,7 +1,6 @@
 using Unity.VisualScripting;
 using UnityEngine;
 
-
 [CreateAssetMenu(fileName = "BasePotion", menuName = "Item/Potion")]
 public class PotionSO : ItemSO
 {
@@ -11,20 +10,19 @@ public class PotionSO : ItemSO
         Mana,
     }
 
-    public PotionType b_potionType;
-    public int b_healAmount;
-
+    public PotionType Potion;
+    public int HealAmount;
 
     public override void Use()
     {
         base.Use();
-        switch (b_potionType)
+        switch (Potion)
         {
-            case PotionType.Health: 
-            this.GetComponent<HealthManagerSO>().Heal(b_healAmount);
+            case PotionType.Health:
+                this.GetComponent<HealthManagerSO>().Heal(HealAmount);
                 break;
             case PotionType.Mana:
-            this.GetComponent<ManaManagerSO>().RestoreMana(b_healAmount);
+                this.GetComponent<ManaManagerSO>().RestoreMana(HealAmount);
                 break;
         }
     }
