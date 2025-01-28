@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e4d218316b3b45e409fea916c34984cd, type: 3}
-  m_Name: Playe Health Manager
+  m_Name: PlayerHealthManager
   m_EditorClassIdentifier: 
-  b_maxHealth: 100
-  b_currentHealth: 100
+  MaxHealth: 100
+  CurrentHealth: 100

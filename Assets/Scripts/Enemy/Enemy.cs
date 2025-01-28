@@ -7,11 +7,11 @@ public class Enemy : MonoBehaviour
 {
     [SerializeField]
     internal EnemySO EnemyData;
-    internal HealthManagerSO Health;
+
+    public EnemyHealthManagerSO Health;
 
     [SerializeField]
     private SpriteRenderer _spriteRenderer;
-    public HealthManagerSO HealthManager;
     public Sprite Sketch;
 
     public UnityEvent OnDeath = new UnityEvent();
@@ -23,9 +23,6 @@ public class Enemy : MonoBehaviour
             Debug.LogError("EnemyData is not assigned.");
             return;
         }
-        Health = ScriptableObject.CreateInstance<HealthManagerSO>();
-        Health.SetMaxHealth(EnemyData.MaxHealthSO);
-        Health.OnEnable();
         _spriteRenderer = GetComponent<SpriteRenderer>();
         TurnManager.Instance.OnEnemyTurnStart.AddListener(OnTurnStart);
         Sketcher.Instance.OnImageSaved.AddListener(() => LoadSprite());
@@ -37,6 +34,9 @@ public class Enemy : MonoBehaviour
                     GameManager.Instance.Player.gameObject
                 )
         );
+        //make an enemy health manager
+        Health = ScriptableObject.CreateInstance<EnemyHealthManagerSO>();
+        Health.Reset();
     }
 
     protected virtual void SetSpriteSize()
@@ -58,14 +58,11 @@ public class Enemy : MonoBehaviour
             Debug.LogError("EnemyData is not assigned.");
             return;
         }
-        HealthManager = ScriptableObject.CreateInstance<HealthManagerSO>();
-        HealthManager.SetMaxHealth(EnemyData.MaxHealthSO);
-        HealthManager.OnEnable();
     }
 
     protected virtual void Update()
     {
-        if (HealthManager.CurrentHealth <= 0)
+        if (Health.CurrentHealth <= 0)
         {
             TurnManager.Instance.HandleEnemyDeath();
             Destroy(gameObject);
@@ -75,7 +72,6 @@ public class Enemy : MonoBehaviour
     public void Reset()
     {
         _spriteRenderer = GetComponent<SpriteRenderer>();
-        HealthManager.Reset();
         _spriteRenderer.sprite = null;
     }
 

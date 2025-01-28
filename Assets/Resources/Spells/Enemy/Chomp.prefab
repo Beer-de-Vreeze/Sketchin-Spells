@@ -44,5 +44,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0e0061a968940d74080582600ff3f4a1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SpellData: {fileID: 11400000, guid: 3e69b3bdfe2ad484f94536f7800761b9, type: 2}
+  SpellData: {fileID: 11400000, guid: f9aa809639d97014ea51b17c0f6fcd73, type: 2}
   Sketch: {fileID: -406359778244772294, guid: 340a9ef21483f6f4c98841a623e78192, type: 3}

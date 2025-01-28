@@ -8,7 +8,8 @@ public class EnemySO : ScriptableObject
 {
     public string EnemyName;
     public string Description;
-    public int MaxHealthSO;
+
+    public int MaxHealth;
 
     public Spell Attack;
     public UnityEvent OnAttack = new UnityEvent();

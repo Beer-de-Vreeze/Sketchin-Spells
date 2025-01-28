@@ -125,7 +125,7 @@ public class GameManager : Singleton<GameManager>
     public void ResetGame()
     {
         string path = Path.Combine(Application.persistentDataPath, "sketches");
-        string newPath = path + "run " + _run;
+        string newPath = path + " run " + _run;
         Directory.Move(path, newPath);
         Directory.CreateDirectory(path);
         PlayerPrefs.SetInt("run", _run + 1);
@@ -140,12 +140,20 @@ public class GameManager : Singleton<GameManager>
             button.GetComponent<SpellButton>().Reset();
         }
 
+        foreach (
+            Enemy enemy in WaveManager.Instance.Waves.Select(wave =>
+                wave.Enemy.GetComponent<Enemy>()
+            )
+        )
+        {
+            enemy.Reset();
+            Destroy(enemy.gameObject);
+        }
+
         // Reset other managers
         WaveManager.Instance.ResetWaveManager();
         UIManager.Instance.ResetUIManager();
         TurnManager.Instance.ResetTurnManager();
-        Inventory.Instance.ResetInventory();
-
         Debug.Log("Game reset");
     }
 }

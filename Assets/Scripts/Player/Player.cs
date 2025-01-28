@@ -8,7 +8,7 @@ using UnityEngine.Events;
 public class Player : MonoBehaviour
 {
     [SerializeField]
-    public HealthManagerSO Health;
+    public PlayerHealthManagerSO Health;
 
     [SerializeField]
     public ManaManagerSO Mana;
@@ -21,7 +21,7 @@ public class Player : MonoBehaviour
     private void Start()
     {
         _spriteRenderer = GetComponent<SpriteRenderer>();
-        Health.healthChangedEvent.AddListener(Death);
+        Health.PlayerhealthChangedEvent.AddListener(Death);
     }
 
     internal void LoadSprite()

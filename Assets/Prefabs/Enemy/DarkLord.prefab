@@ -101,8 +101,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   EnemyData: {fileID: 11400000, guid: 6a4f2cf1733e0054bbff9c6a6d7b6b7f, type: 2}
+  MaxHealth: 45
   _spriteRenderer: {fileID: 8274476085911916816}
-  HealthManager: {fileID: 0}
   Sketch: {fileID: 0}
   OnDeath:
     m_PersistentCalls:

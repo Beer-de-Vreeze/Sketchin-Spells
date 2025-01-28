@@ -13,6 +13,7 @@ public class TurnManager : Singleton<TurnManager>
     public UnityEvent OnPlayerTurnEnd = new UnityEvent();
     public UnityEvent OnEnemyTurnStart = new UnityEvent();
     public UnityEvent OnEnemyTurnEnd = new UnityEvent();
+
     public void SetCurrentEnemy(Enemy enemy)
     {
         CurrentEnemy = enemy;
@@ -21,6 +22,7 @@ public class TurnManager : Singleton<TurnManager>
     public void StartPlayerTurn()
     {
         Debug.Log("Player Turn Started");
+        UIManager.Instance.PlayerUI.SetTarget(CurrentEnemy.gameObject);
         foreach (Button button in UIManager.Instance.PlayerUI.SpellButtons)
         {
             if (
@@ -60,10 +62,10 @@ public class TurnManager : Singleton<TurnManager>
 
     public void StartBattle()
     {
-        StartPlayerTurn();
-            OnPlayerTurnStart.AddListener(StartPlayerTurn);
+        OnPlayerTurnStart.AddListener(StartPlayerTurn);
         OnPlayerTurnEnd.AddListener(EndPlayerTurn);
-        OnEnemyTurnEnd.AddListener(HandleEnemyTurnEnd); // Change listener to a new method
+        OnEnemyTurnEnd.AddListener(HandleEnemyTurnEnd);
+        StartPlayerTurn();
     }
 
     public void EndBattle()
@@ -133,9 +135,6 @@ public class TurnManager : Singleton<TurnManager>
             WaveManager.Instance.SpawnEnemy(0);
         }
         StartBattle();
-        OnPlayerTurnStart.AddListener(StartPlayerTurn);
-        OnPlayerTurnEnd.AddListener(EndPlayerTurn);
-        OnEnemyTurnEnd.AddListener(HandleEnemyTurnEnd);
     }
 
     public void ResetTurnManager()

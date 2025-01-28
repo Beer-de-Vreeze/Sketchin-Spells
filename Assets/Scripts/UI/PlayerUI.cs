@@ -15,26 +15,32 @@ public class PlayerUI : MonoBehaviour
     private void Start()
     {
         EndTurnButton = GetComponentInChildren<Button>();
-        EndTurnButton.onClick.AddListener(() =>
-        {
-            TurnManager.Instance.EndPlayerTurn();
-        });
     }
 
     public void CastSpell(Spell spell, GameObject target)
     {
-        if (spell != null)
+        if (spell != null && target != null)
         {
-            if (target != null)
+            Player player = GameManager.Instance.Player.GetComponent<Player>();
+            if (player.Mana.CurrentMana >= spell.SpellData.ManaCost)
             {
-                if (target.CompareTag("Enemy"))
+                if (spell.SpellData.SpellType == SpellType.Projectile)
                 {
                     spell.AnimateProjectileSpell(this.gameObject, target);
                 }
-                else if (target.CompareTag("Player"))
+                else if (spell.SpellData.SpellType == SpellType.Heal)
                 {
                     spell.AnimateHealSpell(this.gameObject, target);
                 }
+                player.Mana.CurrentMana -= spell.SpellData.ManaCost;
+                GameManager
+                    .Instance.Player.GetComponent<Player>()
+                    .Mana.ManaChangedEvent.Invoke(player.Mana.CurrentMana);
+                TurnManager.Instance.EndPlayerTurn(); // Ensure the player's turn ends after casting a spell
+            }
+            else
+            {
+                Debug.Log("Not enough mana to cast the spell.");
             }
         }
     }

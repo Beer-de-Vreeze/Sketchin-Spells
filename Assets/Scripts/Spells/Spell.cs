@@ -2,6 +2,7 @@ using System.IO;
 using Unity.VisualScripting;
 using UnityEngine;
 
+[RequireComponent(typeof(SpriteRenderer))]
 public class Spell : MonoBehaviour
 {
     public SpellSO SpellData;
@@ -10,6 +11,7 @@ public class Spell : MonoBehaviour
 
     private void OnEnable()
     {
+        _spriteRenderer = GetComponent<SpriteRenderer>();
         Sketcher.Instance.OnImageSaved.AddListener(() => LoadSprite());
         Sketcher.Instance.OnImageSaved.AddListener(() => SetSpriteSize());
     }
@@ -22,80 +24,52 @@ public class Spell : MonoBehaviour
 
     public void ApplySpellEffect(GameObject caster, GameObject target)
     {
-        HealthManagerSO healthManager = null;
-        if(target.CompareTag("Player"))
-        {
-            healthManager = target.GetComponent<Player>().Health;
-        }
-        else if(target.CompareTag("Enemy"))
-        {
-            healthManager = target.GetComponent<Enemy>().HealthManager;
-        }
-
-        // Apply spell type effects
+        Debug.Log(
+            $"Applying spell effect to {target.name} from {caster.name} with {SpellData.SpellName} dealing {SpellData.Damage} damage."
+        );
         switch (SpellData.SpellType)
         {
             case SpellType.Projectile:
-                if (healthManager != null)
+                if (target.CompareTag("Enemy"))
                 {
-                    healthManager.TakeDamage(SpellData.Damage);
+                    Enemy enemy = target.GetComponent<Enemy>();
+                    if (enemy != null)
+                    {
+                        enemy.Health.TakeDamage(SpellData.Damage);
+                        Debug.Log($"Dealt {SpellData.Damage} damage to {target.name}");
+                    }
+                }
+                else if (target.CompareTag("Player"))
+                {
+                    Player player = target.GetComponent<Player>();
+                    if (player != null)
+                    {
+                        player.Health.TakeDamage(SpellData.Damage);
+                        Debug.Log($"Dealt {SpellData.Damage} damage to {target.name}");
+                    }
                 }
                 break;
             case SpellType.Heal:
-                if (healthManager != null) { }
+                if (target.CompareTag("Enemy"))
+                {
+                    Enemy enemy = target.GetComponent<Enemy>();
+                    if (enemy != null)
+                    {
+                        enemy.Health.Heal(SpellData.Damage);
+                        Debug.Log($"Healed {SpellData.Damage} health for {target.name}");
+                    }
+                }
+                else if (target.CompareTag("Player"))
+                {
+                    Player player = target.GetComponent<Player>();
+                    if (player != null)
+                    {
+                        player.Health.Heal(SpellData.Damage);
+                        Debug.Log($"Healed {SpellData.Damage} health for {target.name}");
+                    }
+                }
                 break;
             default:
-                break;
-        }
-
-        // Apply spell element effects
-        switch (SpellData.SpellElement)
-        {
-            case SpellElement.Fire:
-                // Implement fire logic
-                break;
-            case SpellElement.Ice:
-                // Implement ice logic
-                break;
-            case SpellElement.Earth:
-                // Implement earth logic
-                break;
-            case SpellElement.Lightning:
-                // Implement lightning logic
-                break;
-            case SpellElement.DarkMagic:
-                // Implement dark magic logic
-                break;
-            case SpellElement.Support:
-                // Implement support logic
-                break;
-            default:
-                break;
-        }
-
-        // Apply spell effect
-        switch (SpellData.SpellEffect)
-        {
-            case SpellEffect.Buff:
-                if (healthManager != null)
-                {
-                    healthManager.Heal(SpellData.Damage);
-                }
-                break;
-            case SpellEffect.Debuff:
-            case SpellEffect.Stunning:
-                if (target != null)
-                {
-                    healthManager.TakeDamage(SpellData.Damage);
-                }
-                break;
-            case SpellEffect.DOT:
-                if (target != null)
-                {
-                    healthManager.TakeDamage(SpellData.Damage);
-                }
-                break;
-            case SpellEffect.None:
                 break;
         }
     }
@@ -106,15 +80,16 @@ public class Spell : MonoBehaviour
         // Implement projectile spell animation
         //lerp the spell from the player to the target
 
-        Instantiate(gameObject, transform.position, Quaternion.identity);
-        gameObject.transform.position = Vector3.Lerp(
+        GameObject spellInstance = Instantiate(gameObject, transform.position, Quaternion.identity);
+        spellInstance.transform.SetParent(UIManager.Instance.GameCanvas.transform, false);
+        spellInstance.transform.position = Vector3.Lerp(
             caster.transform.position,
             target.transform.position,
             1f
         );
         //when the spell reaches the target, apply the spell effect
-        ApplySpellEffect(gameObject, gameObject);
-        Destroy(gameObject, 1f);
+        ApplySpellEffect(spellInstance, target);
+        Destroy(spellInstance, 1f);
     }
 
     public void AnimateHealSpell(GameObject caster, GameObject target)
@@ -122,19 +97,21 @@ public class Spell : MonoBehaviour
         // Implement heal spell animation
         //lerp the spell from the player to the target
 
-        Instantiate(gameObject, transform.position, Quaternion.identity);
+        GameObject spellInstance = Instantiate(gameObject, transform.position, Quaternion.identity);
+        spellInstance.transform.SetParent(UIManager.Instance.GameCanvas.transform, false);
         //lerp the scale of the spell to make it look like it's healing the target from small to big
-        gameObject.transform.localScale = Vector3.Lerp(
+        spellInstance.transform.localScale = Vector3.Lerp(
             caster.transform.localScale,
             target.transform.localScale,
             1f
         );
-        ApplySpellEffect(gameObject, gameObject);
-        Destroy(gameObject, 1f);
+        ApplySpellEffect(spellInstance, target);
+        Destroy(spellInstance, 1f);
     }
 
     public void Reset()
     {
+        _spriteRenderer = GetComponent<SpriteRenderer>();
         Sketch = null;
         _spriteRenderer.sprite = null;
     }

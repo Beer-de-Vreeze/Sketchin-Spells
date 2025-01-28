@@ -70,9 +70,13 @@ public class SpellButton : MonoBehaviour
 
     public void CastSpell()
     {
+        Debug.Log("Casting spell");
         if (UIManager.Instance.PlayerUI.Target != null)
         {
             UIManager.Instance.PlayerUI.CastSpell(Spell, UIManager.Instance.PlayerUI.Target);
+            Debug.Log(
+                $"Casting spell: {Spell.SpellData.SpellName}, Type: {Spell.SpellData.SpellType}"
+            );
         }
     }
 }

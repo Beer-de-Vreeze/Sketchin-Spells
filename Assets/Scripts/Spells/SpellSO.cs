@@ -5,15 +5,15 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
 
-public enum SpellElement
-{
-    Fire,
-    Ice,
-    Earth,
-    Lightning,
-    DarkMagic,
-    Support
-}
+// public enum SpellElement
+// {
+//     Fire,
+//     Ice,
+//     Earth,
+//     Lightning,
+//     DarkMagic,
+//     Support
+// }
 
 public enum SpellTarget
 {
@@ -28,14 +28,14 @@ public enum SpellType
     Shield,
 }
 
-public enum SpellEffect
-{
-    Stunning,
-    Buff,
-    Debuff,
-    DOT,
-    None
-}
+// public enum SpellEffect
+// {
+//     Stunning,
+//     Buff,
+//     Debuff,
+//     DOT,
+//     None
+// }
 
 [CreateAssetMenu(fileName = "BaseSpell", menuName = "Create Spell")]
 public class SpellSO : ScriptableObject
@@ -53,10 +53,10 @@ public class SpellSO : ScriptableObject
     public SpellType SpellType;
     public SpellTarget SpellTarget;
 
-    public SpellElement SpellElement;
+    // public SpellElement SpellElement;
 
-    [Header("Spell Effects")]
-    public SpellEffect SpellEffect;
+    // [Header("Spell Effects")]
+    // public SpellEffect SpellEffect;
 
     [NonSerialized]
     public UnityEvent OnSpriteLoaded = new UnityEvent();

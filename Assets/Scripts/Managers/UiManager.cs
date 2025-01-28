@@ -7,12 +7,6 @@ public class UIManager : Singleton<UIManager>
 {
     #region Variables
     [SerializeField]
-    private HealthManagerSO _healthManager;
-
-    [SerializeField]
-    private ManaManagerSO _manaManager;
-
-    [SerializeField]
     public GameObject _sketchCanvas;
 
     [SerializeField]
@@ -47,12 +41,18 @@ public class UIManager : Singleton<UIManager>
     #region Unity
     private void OnEnable()
     {
-        _healthManager.healthChangedEvent.AddListener(UpdateHealthBar);
-        _manaManager.ManaChangedEvent.AddListener(UpdateManaBar);
-        _healthManager.healthChangedEvent.AddListener(UpdateHealthText);
-        _manaManager.ManaChangedEvent.AddListener(UpdateManaText);
-        _healthManager.healthChangedEvent.Invoke(_healthManager.CurrentHealth);
-        _manaManager.ManaChangedEvent.Invoke(_manaManager.CurrentMana);
+        GameManager
+            .Instance.Player.GetComponent<Player>()
+            .Health.PlayerhealthChangedEvent.AddListener(UpdateHealthBar);
+        GameManager
+            .Instance.Player.GetComponent<Player>()
+            .Health.PlayerhealthChangedEvent.AddListener(UpdateHealthText);
+        GameManager
+            .Instance.Player.GetComponent<Player>()
+            .Mana.ManaChangedEvent.AddListener(UpdateManaBar);
+        GameManager
+            .Instance.Player.GetComponent<Player>()
+            .Mana.ManaChangedEvent.AddListener(UpdateManaText);
         GameManager.Instance.Player.GetComponent<Player>().OnPlayerDeath.AddListener(ENDGAME);
         PlayerUI = FindFirstObjectByType<PlayerUI>();
     }
@@ -61,8 +61,10 @@ public class UIManager : Singleton<UIManager>
     {
         //get the player health and mana from the healthSO and manaSO
         Player player = GameManager.Instance.Player.GetComponent<Player>();
-        player.Health = _healthManager;
-        player.Mana = _manaManager;
+        UpdateHealthBar(player.Health.CurrentHealth);
+        UpdateHealthText(player.Health.CurrentHealth);
+        UpdateManaBar(player.Mana.CurrentMana);
+        UpdateManaText(player.Mana.CurrentMana);
         CloseAllCanvas();
         OpenMenuCanvas();
     }
@@ -166,13 +168,13 @@ public class UIManager : Singleton<UIManager>
     public void UpdateHealthText(int amount)
     {
         //68/100
-        _healthText.text = amount.ToString() + "/" + _healthManager.MaxHealth.ToString();
+        _healthText.text = amount.ToString() + "/" + GameManager.Instance.Player.GetComponent<Player>().Health.MaxHealth.ToString();
     }
 
     public void UpdateManaText(int amount)
     {
         //8/10
-        _manaText.text = amount.ToString() + "/" + _manaManager.MaxMana.ToString();
+        _manaText.text = amount.ToString() + "/" + GameManager.Instance.Player.GetComponent<Player>().Mana.MaxMana.ToString();
     }
 
     private void ENDGAME()

@@ -58,11 +58,4 @@ public class Inventory : Singleton<Inventory>
         Gold -= gold;
         GoldChangedEvent.Invoke(Gold);
     }
-
-    public void ResetInventory()
-    {
-        PInventory.Clear();
-        Gold = 0;
-        GoldChangedEvent.Invoke(Gold);
-    }
 }
