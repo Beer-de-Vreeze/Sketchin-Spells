@@ -45,6 +45,7 @@ public class PlayerHealthManagerSO : HealthManagerSO
     public override void SetMaxHealth(int amount)
     {
         MaxHealth = amount;
+        PlayerhealthChangedEvent.Invoke(MaxHealth);
     }
 
     public override int GetCurrentHealth()
@@ -52,9 +53,16 @@ public class PlayerHealthManagerSO : HealthManagerSO
         return CurrentHealth;
     }
 
+    private void Update()
+    {
+        if (CurrentHealth >= MaxHealth)
+        {
+            CurrentHealth = MaxHealth;
+        }
+    }
+
     public override void Reset()
     {
-        CurrentHealth = MaxHealth;
-        PlayerhealthChangedEvent.Invoke(CurrentHealth);
+        PlayerhealthChangedEvent.Invoke(MaxHealth);
     }
 }

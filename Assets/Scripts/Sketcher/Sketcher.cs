@@ -423,7 +423,7 @@ public class Sketcher : Singleton<Sketcher>
         }
     }
 
-    private void SaveImage()
+    public void SaveImage()
     {
         RenderTexture tempRT = RenderTexture.GetTemporary(
             RenderTexture.width,

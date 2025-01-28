@@ -27,16 +27,10 @@ public class Enemy : MonoBehaviour
         TurnManager.Instance.OnEnemyTurnStart.AddListener(OnTurnStart);
         Sketcher.Instance.OnImageSaved.AddListener(() => LoadSprite());
         Sketcher.Instance.OnImageSaved.AddListener(() => SetSpriteSize());
-        TurnManager.Instance.OnEnemyTurnStart.AddListener(
-            () =>
-                EnemyData.Attack.ApplySpellEffect(
-                    this.gameObject,
-                    GameManager.Instance.Player.gameObject
-                )
-        );
         //make an enemy health manager
         Health = ScriptableObject.CreateInstance<EnemyHealthManagerSO>();
         Health.Reset();
+        Health.SetMaxHealth(EnemyData.MaxHealth);
     }
 
     protected virtual void SetSpriteSize()
@@ -58,14 +52,14 @@ public class Enemy : MonoBehaviour
             Debug.LogError("EnemyData is not assigned.");
             return;
         }
+        UIManager.Instance.PlayerUI.SetTarget(this.gameObject);
     }
 
     protected virtual void Update()
     {
         if (Health.CurrentHealth <= 0)
         {
-            TurnManager.Instance.HandleEnemyDeath();
-            Destroy(gameObject);
+            Death();
         }
     }
 
@@ -108,11 +102,10 @@ public class Enemy : MonoBehaviour
         if (Health.CurrentHealth <= 0)
         {
             OnDeath.Invoke();
+            TurnManager.Instance.HandleEnemyDeath();
+            Destroy(gameObject);
         }
-        OnDeath.AddListener(() => Destroy(gameObject, 0.5f));
-        OnDeath.RemoveListener(() => Destroy(gameObject, 0.5f));
-        TurnManager.Instance.OnEnemyTurnStart.RemoveListener(
-            () => EnemyData.Cast(this.gameObject, GameManager.Instance.Player.gameObject)
-        );
+        OnDeath.RemoveAllListeners();
+        TurnManager.Instance.OnEnemyTurnStart.RemoveListener(OnTurnStart);
     }
 }

@@ -15,9 +15,7 @@ MonoBehaviour:
   SpellName: Chomp
   Description: Chompy
   Icon: {fileID: 731669317463316060, guid: 33d7bc89a70a33c4c875110226a30228, type: 3}
-  Damage: 15
+  Damage: 3
   ManaCost: 0
   SpellType: 0
   SpellTarget: 1
-  SpellElement: 0
-  SpellEffect: 0

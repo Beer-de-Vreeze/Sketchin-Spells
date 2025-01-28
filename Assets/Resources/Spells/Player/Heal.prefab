@@ -47,6 +47,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SpellData: {fileID: 11400000, guid: 3e69b3bdfe2ad484f94536f7800761b9, type: 2}
   Sketch: {fileID: -406359778244772294, guid: 340a9ef21483f6f4c98841a623e78192, type: 3}
+  _spriteRenderer: {fileID: 6888473539120023472}
 --- !u!212 &6888473539120023472
 SpriteRenderer:
   m_ObjectHideFlags: 0

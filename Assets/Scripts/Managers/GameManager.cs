@@ -16,6 +16,28 @@ public class GameManager : Singleton<GameManager>
     private void Start()
     {
         PlayerPrefs.SetInt("run", _run);
+
+        // Unlock the first spell button and lock the others
+        if (UIManager.Instance.PlayerUI != null && UIManager.Instance.PlayerUI.SpellButtons != null)
+        {
+            for (int i = 0; i < UIManager.Instance.PlayerUI.SpellButtons.Count; i++)
+            {
+                SpellButton spellButton = UIManager
+                    .Instance.PlayerUI.SpellButtons[i]
+                    .GetComponent<SpellButton>();
+                if (spellButton != null)
+                {
+                    if (i == 0)
+                    {
+                        spellButton.UnlockSpell();
+                    }
+                    else
+                    {
+                        spellButton.Reset();
+                    }
+                }
+            }
+        }
     }
 
     public IEnumerator StartGameSequence()
@@ -74,6 +96,12 @@ public class GameManager : Singleton<GameManager>
                     .UnlockSpell();
                 yield return null;
             }
+            //wait until the sketch is saved
+            yield return new WaitUntil(() => Sketcher.Instance.OnImageSaved != null);
+            UIManager
+                .Instance.PlayerUI.SpellButtons[0]
+                .GetComponent<SpellButton>()
+                .Spell.LoadSprite();
 
             yield return new WaitUntil(
                 () =>
@@ -102,6 +130,7 @@ public class GameManager : Singleton<GameManager>
         // Start the dialogue
         UIManager.Instance.ClosePlayerCanvas();
         UIManager.Instance.OpenDialogueCanvas();
+
         DialogueManager.Instance.StartDialogue(DialogueManager.Instance.Dialogues[dialogueIndex]);
         DialogueManager.Instance.OnDialogueEnd.AddListener(() => dialogueEnded = true);
 
@@ -124,6 +153,7 @@ public class GameManager : Singleton<GameManager>
     [ContextMenu("Reset Game")]
     public void ResetGame()
     {
+        _run++;
         string path = Path.Combine(Application.persistentDataPath, "sketches");
         string newPath = path + " run " + _run;
         Directory.Move(path, newPath);
@@ -141,15 +171,18 @@ public class GameManager : Singleton<GameManager>
         }
 
         foreach (
-            Enemy enemy in WaveManager.Instance.Waves.Select(wave =>
-                wave.Enemy.GetComponent<Enemy>()
-            )
+            Enemy enemy in GameObject
+                .FindGameObjectsWithTag("Enemy")
+                .Select(enemy => enemy.GetComponent<Enemy>())
         )
         {
             enemy.Reset();
             Destroy(enemy.gameObject);
         }
-
+        foreach (Button Spell in UIManager.Instance.PlayerUI.SpellButtons)
+        {
+            Spell.GetComponent<SpellButton>().Reset();
+        }
         // Reset other managers
         WaveManager.Instance.ResetWaveManager();
         UIManager.Instance.ResetUIManager();

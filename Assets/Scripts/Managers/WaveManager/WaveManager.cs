@@ -20,7 +20,10 @@ public class WaveManager : Singleton<WaveManager>
                         Quaternion.identity,
                         parent: UIManager.Instance.GameCanvas.transform
                     );
-                    TurnManager.Instance.SetCurrentEnemy(wave.Enemy.GetComponent<Enemy>());
+                    //find the enemy in the scene
+                    TurnManager.Instance.SetCurrentEnemy(
+                        UIManager.Instance.GameCanvas.GetComponentInChildren<Enemy>()
+                    );
                     CurrentWaveIndex++;
                 }
             }

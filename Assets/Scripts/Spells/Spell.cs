@@ -7,23 +7,46 @@ public class Spell : MonoBehaviour
 {
     public SpellSO SpellData;
     public Sprite Sketch;
+
+    [SerializeField]
     private SpriteRenderer _spriteRenderer;
 
     private void OnEnable()
     {
-        _spriteRenderer = GetComponent<SpriteRenderer>();
         Sketcher.Instance.OnImageSaved.AddListener(() => LoadSprite());
         Sketcher.Instance.OnImageSaved.AddListener(() => SetSpriteSize());
     }
 
     private void SetSpriteSize()
     {
-        _spriteRenderer.size = new Vector2(2.54f, 3.99f);
-        transform.localScale = new Vector3(108f, 108f, 108f);
+        _spriteRenderer.size = new Vector2(2.54f / 3, 3.99f / 3);
+        transform.localScale = new Vector3(108f / 3, 108f / 3, 108f / 3);
     }
 
     public void ApplySpellEffect(GameObject caster, GameObject target)
     {
+        if (SpellData == null)
+        {
+            Debug.LogError("SpellData is null");
+            return;
+        }
+
+        if (target == null)
+        {
+            Debug.LogError("Target is null");
+            return;
+        }
+
+        if (_spriteRenderer == null)
+        {
+            _spriteRenderer = GetComponent<SpriteRenderer>();
+            if (_spriteRenderer == null)
+            {
+                Debug.LogError("SpriteRenderer component is missing.");
+                return;
+            }
+        }
+
         Debug.Log(
             $"Applying spell effect to {target.name} from {caster.name} with {SpellData.SpellName} dealing {SpellData.Damage} damage."
         );
@@ -77,8 +100,11 @@ public class Spell : MonoBehaviour
     //make an attack animation for the spell
     public void AnimateProjectileSpell(GameObject caster, GameObject target)
     {
-        // Implement projectile spell animation
-        //lerp the spell from the player to the target
+        if (caster == null || target == null)
+        {
+            Debug.LogError("Caster or target is null");
+            return;
+        }
 
         GameObject spellInstance = Instantiate(gameObject, transform.position, Quaternion.identity);
         spellInstance.transform.SetParent(UIManager.Instance.GameCanvas.transform, false);
@@ -94,8 +120,11 @@ public class Spell : MonoBehaviour
 
     public void AnimateHealSpell(GameObject caster, GameObject target)
     {
-        // Implement heal spell animation
-        //lerp the spell from the player to the target
+        if (caster == null || target == null)
+        {
+            Debug.LogError("Caster or target is null");
+            return;
+        }
 
         GameObject spellInstance = Instantiate(gameObject, transform.position, Quaternion.identity);
         spellInstance.transform.SetParent(UIManager.Instance.GameCanvas.transform, false);
@@ -136,6 +165,7 @@ public class Spell : MonoBehaviour
             );
             Sketch = sprite;
             _spriteRenderer.sprite = Sketch;
+            SetSpriteSize();
             Debug.Log($"Spell sprite loaded" + SpellData.SpellName + path);
         }
         else

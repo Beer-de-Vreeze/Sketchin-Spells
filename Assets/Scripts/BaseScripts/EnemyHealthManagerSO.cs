@@ -49,6 +49,7 @@ public class EnemyHealthManagerSO : HealthManagerSO
     public override void SetMaxHealth(int amount)
     {
         MaxHealth = amount;
+        CurrentHealth = MaxHealth;
     }
 
     public override int GetCurrentHealth()

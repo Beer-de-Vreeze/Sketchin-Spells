@@ -21,27 +21,33 @@ public class PlayerUI : MonoBehaviour
     {
         if (spell != null && target != null)
         {
-            Player player = GameManager.Instance.Player.GetComponent<Player>();
-            if (player.Mana.CurrentMana >= spell.SpellData.ManaCost)
+            Player player = GameManager.Instance.Player?.GetComponent<Player>();
+            if (
+                player != null
+                && player.Mana != null
+                && player.Mana.CurrentMana >= spell.SpellData.ManaCost
+            )
             {
                 if (spell.SpellData.SpellType == SpellType.Projectile)
                 {
-                    spell.AnimateProjectileSpell(this.gameObject, target);
+                    spell.ApplySpellEffect(this.gameObject, target);
                 }
                 else if (spell.SpellData.SpellType == SpellType.Heal)
                 {
-                    spell.AnimateHealSpell(this.gameObject, target);
+                    spell.ApplySpellEffect(this.gameObject, this.gameObject);
                 }
                 player.Mana.CurrentMana -= spell.SpellData.ManaCost;
-                GameManager
-                    .Instance.Player.GetComponent<Player>()
-                    .Mana.ManaChangedEvent.Invoke(player.Mana.CurrentMana);
-                TurnManager.Instance.EndPlayerTurn(); // Ensure the player's turn ends after casting a spell
+                player.Mana.ManaChangedEvent.Invoke(player.Mana.CurrentMana);
+                TurnManager.Instance.OnPlayerTurnEnd.Invoke();
             }
             else
             {
-                Debug.Log("Not enough mana to cast the spell.");
+                Debug.Log("Not enough mana to cast the spell or player/mana is null.");
             }
+        }
+        else
+        {
+            Debug.LogError("Spell or target is null");
         }
     }
 

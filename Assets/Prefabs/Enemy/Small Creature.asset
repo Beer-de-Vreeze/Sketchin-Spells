@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   EnemyName: Creature
   Description: a small creature
-  MaxHealthSO: 25
+  MaxHealth: 20
   Attack: {fileID: 1437171987163119582, guid: cdc9997bb5a0dcb45b2c7268cc0a35d5, type: 3}
   OnAttack:
     m_PersistentCalls:
