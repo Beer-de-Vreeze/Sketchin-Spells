@@ -15,7 +15,7 @@ MonoBehaviour:
   SpellName: Heal
   Description: Healing magic
   Icon: {fileID: -406359778244772294, guid: 340a9ef21483f6f4c98841a623e78192, type: 3}
-  Damage: 4
+  Damage: 50
   ManaCost: 3
-  SpellType: 2
+  SpellType: 1
   SpellTarget: 0

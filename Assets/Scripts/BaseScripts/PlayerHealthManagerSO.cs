@@ -63,6 +63,8 @@ public class PlayerHealthManagerSO : HealthManagerSO
 
     public override void Reset()
     {
-        PlayerhealthChangedEvent.Invoke(MaxHealth);
+        Debug.Log("Resetting health");
+        CurrentHealth = MaxHealth;
+        PlayerhealthChangedEvent.Invoke(CurrentHealth);
     }
 }

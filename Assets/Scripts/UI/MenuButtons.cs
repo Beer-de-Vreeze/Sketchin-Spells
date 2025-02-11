@@ -18,12 +18,10 @@ public class MenuButtons : MonoBehaviour
     public void RestartGame()
     {
         GameManager.Instance.ResetGame();
-        StartGame();
     }
 
     public void QuitGame()
     {
-        GameManager.Instance.ResetGame();
 #if (UNITY_EDITOR || DEVELOPMENT_BUILD)
         Debug.Log(
             this.name
@@ -40,5 +38,10 @@ public class MenuButtons : MonoBehaviour
 #elif (UNITY_WEBGL)
         Application.OpenURL("itch url ");
 #endif
+    }
+
+    private void OnApplicationQuit()
+    {
+        GameManager.Instance.ResetGame();
     }
 }

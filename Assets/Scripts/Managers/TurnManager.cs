@@ -76,75 +76,6 @@ public class TurnManager : Singleton<TurnManager>
         StartPlayerTurn();
     }
 
-    public IEnumerator EndBattle()
-    {
-        yield return new WaitForSeconds(2);
-        UIManager.Instance.CloseGameCanvas();
-        UIManager.Instance.OpenEndGameCanvas();
-
-        //     GameManager.Instance.Player.GetComponent<Player>().Health.Reset();
-        //     GameManager.Instance.Player.GetComponent<Player>().Mana.Reset();
-        //     if (_spellCount == UIManager.Instance.PlayerUI.SpellButtons.Count)
-        //     {
-        //         WaveManager.Instance.SpawnEnemy(1);
-        //         Enemy enemy = GameObject.FindWithTag("Enemy").GetComponent<Enemy>();
-        //         // All spells unlocked, play dialogue number 6 and sketch the Dark Lord
-        //         yield return GameManager.Instance.StartDialogueAndSketch(
-        //             6,
-        //             SketchType.Enemy,
-        //             enemy.EnemyData.EnemyName,
-        //             enemy.EnemyData.Description
-        //         );
-        //         //wait until sketch is saved
-        //         WaitUntil waitUntil = new WaitUntil(() => enemy.Sketch != null);
-
-        //         StartBattle();
-
-        //         CurrentEnemy.OnDeath.AddListener(EndGame);
-        //     }
-        //     else
-        //     {
-        //         _spellCount++;
-        //         GameManager.Instance.Player.Mana.RestoreMana(2);
-
-        //         // Start dialogue and sketching sequence for new spell
-        //         yield return GameManager.Instance.StartDialogueAndSketch(
-        //             4,
-        //             SketchType.Spell,
-        //             UIManager
-        //                 .Instance.PlayerUI.SpellButtons[_spellCount]
-        //                 .GetComponent<SpellButton>()
-        //                 .Spell.SpellData.SpellName,
-        //             UIManager
-        //                 .Instance.PlayerUI.SpellButtons[_spellCount]
-        //                 .GetComponent<SpellButton>()
-        //                 .Spell.SpellData.Description
-        //         );
-
-        //         UIManager
-        //             .Instance.PlayerUI.SpellButtons[_spellCount]
-        //             .GetComponent<SpellButton>()
-        //             .UnlockSpell();
-        //         UIManager
-        //             .Instance.PlayerUI.SpellButtons[_spellCount]
-        //             .GetComponent<SpellButton>()
-        //             .Spell.LoadSprite();
-
-        //         yield return new WaitUntil(
-        //             () =>
-        //                 UIManager
-        //                     .Instance.PlayerUI.SpellButtons[_spellCount]
-        //                     .GetComponent<SpellButton>()
-        //                     .Spell.Sketch != null
-        //         );
-
-        //         WaveManager.Instance.SpawnEnemy(0);
-        //         //load enemy sprite
-        //         StartBattle();
-        //     }
-        //     yield return null;
-    }
-
     public void EndGame()
     {
         UIManager.Instance.CloseAllCanvas();
@@ -153,34 +84,28 @@ public class TurnManager : Singleton<TurnManager>
 
     public void HandleEnemyDeath()
     {
-        if (WaveManager.Instance.CurrentWaveIndex == 5)
+        _spellCount++;
+        GameManager.Instance.Player.Mana.RestoreMana(2);
+
+        if (_spellCount < UIManager.Instance.PlayerUI.SpellButtons.Count)
         {
-            WaveManager.Instance.SpawnEnemy(1);
-            if (CurrentEnemy != null)
-            {
-                CurrentEnemy.OnDeath.AddListener(EndGame);
-            }
+            StartCoroutine(HandleNewSpellUnlock());
+            WaveManager.Instance.SpawnEnemy(0);
+            GameManager.Instance.Player.Mana.Reset();
+            GameManager.Instance.Player.Health.Reset();
+            StartBattle();
         }
         else
         {
-            _spellCount++;
-            GameManager.Instance.Player.Mana.RestoreMana(2);
+            Debug.LogWarning("No more spell buttons to unlock.");
+            // WaveManager.Instance.SpawnEnemy(1); // Commented out boss spawning
+            // StartCoroutine(StartFinalDialogue()); // Commented out final dialogue
+            StartCoroutine(StartEndlessMode());
+        }
 
-            if (_spellCount < UIManager.Instance.PlayerUI.SpellButtons.Count)
-            {
-                StartCoroutine(HandleNewSpellUnlock());
-            }
-            else
-            {
-                Debug.LogWarning("No more spell buttons to unlock.");
-            }
-
-            if (CurrentEnemy != null)
-            {
-                Destroy(CurrentEnemy.gameObject);
-            }
-            WaveManager.Instance.SpawnEnemy(0);
-            StartBattle();
+        if (CurrentEnemy != null)
+        {
+            Destroy(CurrentEnemy.gameObject);
         }
     }
 
@@ -215,6 +140,27 @@ public class TurnManager : Singleton<TurnManager>
                     .GetComponent<SpellButton>()
                     .Spell.Sketch != null
         );
+    }
+
+    private IEnumerator StartFinalDialogue()
+    {
+        yield return GameManager.Instance.StartDialogueAndSketch(
+            5,
+            SketchType.Enemy,
+            CurrentEnemy.EnemyData.EnemyName,
+            CurrentEnemy.EnemyData.Description
+        );
+    }
+
+    private IEnumerator StartEndlessMode()
+    {
+        yield return new WaitUntil(() => CurrentEnemy == null);
+        while (true)
+        {
+            int randomEnemy = Random.Range(0, 2);
+            WaveManager.Instance.SpawnEnemy(randomEnemy);
+            yield return new WaitUntil(() => CurrentEnemy == null);
+        }
     }
 
     public void ResetTurnManager()

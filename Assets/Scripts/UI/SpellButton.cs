@@ -29,6 +29,15 @@ public class SpellButton : MonoBehaviour
         CheckSpellUnlock();
     }
 
+    private void Start()
+    {
+        Button button = GetComponent<Button>();
+        if (button != null)
+        {
+            button.onClick.AddListener(CastSpell);
+        }
+    }
+
     private void CheckSpellUnlock()
     {
         if (Spell != null)
@@ -69,10 +78,25 @@ public class SpellButton : MonoBehaviour
             && UIManager.Instance.PlayerUI.Target != null
         )
         {
-            UIManager.Instance.PlayerUI.CastSpell(Spell, UIManager.Instance.PlayerUI.Target);
-            Debug.Log(
-                $"Casting spell: {Spell.SpellData.SpellName}, Type: {Spell.SpellData.SpellType}"
-            );
+            Player player = GameManager.Instance.Player?.GetComponent<Player>();
+            if (player != null && player.Mana != null)
+            {
+                if (player.Mana.CurrentMana >= Spell.SpellData.ManaCost)
+                {
+                    UIManager.Instance.PlayerUI.CastSpell(Spell, UIManager.Instance.PlayerUI.Target);
+                    player.Mana.CurrentMana -= Spell.SpellData.ManaCost;
+                    player.Mana.ManaChangedEvent.Invoke(player.Mana.CurrentMana);
+                    Debug.Log($"Casting spell: {Spell.SpellData.SpellName}, Type: {Spell.SpellData.SpellType}");
+                }
+                else
+                {
+                    Debug.Log("Not enough mana to cast the spell.");
+                }
+            }
+            else
+            {
+                Debug.Log("Player or mana is null.");
+            }
         }
     }
 }

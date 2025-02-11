@@ -28,7 +28,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 22.287447, y: 14.022409, z: -1.4160594}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 36, y: 36, z: 36}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -46,7 +46,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SpellData: {fileID: 11400000, guid: d36861b104be65342b17e80fc942648f, type: 2}
-  Sketch: {fileID: -406359778244772294, guid: 340a9ef21483f6f4c98841a623e78192, type: 3}
+  Sketch: {fileID: 0}
   _spriteRenderer: {fileID: 6888473539120023472}
 --- !u!212 &6888473539120023472
 SpriteRenderer:
@@ -97,7 +97,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 0.84666663, y: 1.33}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 0

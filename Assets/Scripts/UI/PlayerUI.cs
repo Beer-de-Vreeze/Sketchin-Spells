@@ -15,6 +15,10 @@ public class PlayerUI : MonoBehaviour
     private void Start()
     {
         EndTurnButton = GetComponentInChildren<Button>();
+        foreach (Button button in SpellButtons)
+        {
+            button.onClick.AddListener(() => CastSpell(button.GetComponent<SpellButton>().Spell, Target));
+        }
     }
 
     public void CastSpell(Spell spell, GameObject target)
@@ -22,27 +26,30 @@ public class PlayerUI : MonoBehaviour
         if (spell != null && target != null)
         {
             Player player = GameManager.Instance.Player?.GetComponent<Player>();
-            if (
-                player != null
-                && player.Mana != null
-                && player.Mana.CurrentMana >= spell.SpellData.ManaCost
-            )
+            if (player != null && player.Mana != null)
             {
-                if (spell.SpellData.SpellType == SpellType.Projectile)
+                if (player.Mana.CurrentMana >= spell.SpellData.ManaCost)
                 {
-                    spell.ApplySpellEffect(this.gameObject, target);
+                    if (spell.SpellData.SpellType == SpellType.Projectile)
+                    {
+                        spell.ApplySpellEffect(this.gameObject, target);
+                    }
+                    else if (spell.SpellData.SpellType == SpellType.Heal)
+                    {
+                        spell.ApplySpellEffect(player.gameObject, player.gameObject);
+                    }
+                    player.Mana.CurrentMana -= spell.SpellData.ManaCost;
+                    player.Mana.ManaChangedEvent.Invoke(player.Mana.CurrentMana);
+                    TurnManager.Instance.OnPlayerTurnEnd.Invoke();
                 }
-                else if (spell.SpellData.SpellType == SpellType.Heal)
+                else
                 {
-                    spell.ApplySpellEffect(this.gameObject, this.gameObject);
+                    Debug.Log("Not enough mana to cast the spell.");
                 }
-                player.Mana.CurrentMana -= spell.SpellData.ManaCost;
-                player.Mana.ManaChangedEvent.Invoke(player.Mana.CurrentMana);
-                TurnManager.Instance.OnPlayerTurnEnd.Invoke();
             }
             else
             {
-                Debug.Log("Not enough mana to cast the spell or player/mana is null.");
+                Debug.Log("Player or mana is null.");
             }
         }
         else

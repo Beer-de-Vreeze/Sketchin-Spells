@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   EnemyName: Dark Lord
   Description: A powerful creature hellbend to destroy the world
-  MaxHealth: 50
+  MaxHealth: 150
   Attack: {fileID: 1437171987163119582, guid: cdc9997bb5a0dcb45b2c7268cc0a35d5, type: 3}
   OnAttack:
     m_PersistentCalls:

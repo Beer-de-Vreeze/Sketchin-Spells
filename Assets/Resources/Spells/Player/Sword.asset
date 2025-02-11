@@ -15,7 +15,7 @@ MonoBehaviour:
   SpellName: Sword
   Description: a melee weapon to hit your foes
   Icon: {fileID: -406359778244772294, guid: 340a9ef21483f6f4c98841a623e78192, type: 3}
-  Damage: 2
+  Damage: 10
   ManaCost: 0
   SpellType: 0
   SpellTarget: 1

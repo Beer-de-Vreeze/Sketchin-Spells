@@ -15,7 +15,7 @@ MonoBehaviour:
   SpellName: Projectile
   Description: A magical projectile
   Icon: {fileID: -406359778244772294, guid: 340a9ef21483f6f4c98841a623e78192, type: 3}
-  Damage: 3
+  Damage: 15
   ManaCost: 2
   SpellType: 0
   SpellTarget: 1

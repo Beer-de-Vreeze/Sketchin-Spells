@@ -59,4 +59,13 @@ public class Player : MonoBehaviour
         Mana.Reset();
         _spriteRenderer.sprite = null;
     }
+
+    public void ResetHealthAndMana()
+    {
+        //create a new instance of the health and mana
+        Health = ScriptableObject.CreateInstance<PlayerHealthManagerSO>();
+        Mana = ScriptableObject.CreateInstance<ManaManagerSO>();
+        Health.OnEnable();
+        Mana.OnEnable();
+    }
 }
