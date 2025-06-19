@@ -17,7 +17,9 @@ public class PlayerUI : MonoBehaviour
         EndTurnButton = GetComponentInChildren<Button>();
         foreach (Button button in SpellButtons)
         {
-            button.onClick.AddListener(() => CastSpell(button.GetComponent<SpellButton>().Spell, Target));
+            button.onClick.AddListener(
+                () => CastSpell(button.GetComponent<SpellButton>().Spell, Target)
+            );
         }
     }
 
@@ -32,11 +34,15 @@ public class PlayerUI : MonoBehaviour
                 {
                     if (spell.SpellData.SpellType == SpellType.Projectile)
                     {
-                        spell.ApplySpellEffect(this.gameObject, target);
+                        spell.AnimateProjectileSpell(this.gameObject, target); // Use animation
                     }
                     else if (spell.SpellData.SpellType == SpellType.Heal)
                     {
-                        spell.ApplySpellEffect(player.gameObject, player.gameObject);
+                        spell.AnimateHealSpell(player.gameObject, player.gameObject); // Use animation
+                    }
+                    else
+                    {
+                        spell.ApplySpellEffect(this.gameObject, target);
                     }
                     player.Mana.CurrentMana -= spell.SpellData.ManaCost;
                     player.Mana.ManaChangedEvent.Invoke(player.Mana.CurrentMana);

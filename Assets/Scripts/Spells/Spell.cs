@@ -1,3 +1,4 @@
+using System.Collections;
 using System.IO;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -105,17 +106,31 @@ public class Spell : MonoBehaviour
             Debug.LogError("Caster or target is null");
             return;
         }
+        StartCoroutine(ProjectileAnimationCoroutine(caster, target));
+    }
 
-        GameObject spellInstance = Instantiate(gameObject, transform.position, Quaternion.identity);
-        spellInstance.transform.SetParent(UIManager.Instance.GameCanvas.transform, false);
-        spellInstance.transform.position = Vector3.Lerp(
+    private IEnumerator ProjectileAnimationCoroutine(GameObject caster, GameObject target)
+    {
+        GameObject spellInstance = Instantiate(
+            gameObject,
             caster.transform.position,
-            target.transform.position,
-            1f
+            Quaternion.identity
         );
-        //when the spell reaches the target, apply the spell effect
+        spellInstance.transform.SetParent(UIManager.Instance.GameCanvas.transform, false);
+        spellInstance.GetComponent<Spell>().LoadSprite();
+        float duration = 0.5f;
+        float elapsed = 0f;
+        Vector3 start = caster.transform.position;
+        Vector3 end = target.transform.position;
+        while (elapsed < duration)
+        {
+            spellInstance.transform.position = Vector3.Lerp(start, end, elapsed / duration);
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+        spellInstance.transform.position = end;
         ApplySpellEffect(spellInstance, target);
-        Destroy(spellInstance, 1f);
+        Destroy(spellInstance, 0.5f);
     }
 
     public void AnimateHealSpell(GameObject caster, GameObject target)
@@ -125,17 +140,36 @@ public class Spell : MonoBehaviour
             Debug.LogError("Caster or target is null");
             return;
         }
+        StartCoroutine(HealAnimationCoroutine(caster, target));
+    }
 
-        GameObject spellInstance = Instantiate(gameObject, transform.position, Quaternion.identity);
-        spellInstance.transform.SetParent(UIManager.Instance.GameCanvas.transform, false);
-        //lerp the scale of the spell to make it look like it's healing the target from small to big
-        spellInstance.transform.localScale = Vector3.Lerp(
-            caster.transform.localScale,
-            target.transform.localScale,
-            1f
+    private IEnumerator HealAnimationCoroutine(GameObject caster, GameObject target)
+    {
+        GameObject spellInstance = Instantiate(
+            gameObject,
+            target.transform.position,
+            Quaternion.identity
         );
+        spellInstance.transform.SetParent(UIManager.Instance.GameCanvas.transform, false);
+        spellInstance.GetComponent<Spell>().LoadSprite();
+        float duration = 0.5f;
+        float elapsed = 0f;
+        Vector3 startScale = Vector3.zero;
+        Vector3 endScale = target.transform.localScale * 1.5f;
+        spellInstance.transform.localScale = startScale;
+        while (elapsed < duration)
+        {
+            spellInstance.transform.localScale = Vector3.Lerp(
+                startScale,
+                endScale,
+                elapsed / duration
+            );
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+        spellInstance.transform.localScale = endScale;
         ApplySpellEffect(spellInstance, target);
-        Destroy(spellInstance, 1f);
+        Destroy(spellInstance, 0.5f);
     }
 
     public void Reset()

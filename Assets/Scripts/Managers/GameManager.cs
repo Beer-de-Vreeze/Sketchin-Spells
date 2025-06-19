@@ -15,7 +15,31 @@ public class GameManager : Singleton<GameManager>
 
     private void Start()
     {
+        // Find the next available run number by checking for existing folders
+        int lastRun = PlayerPrefs.GetInt("run", 1);
+        int nextRun = lastRun + 1;
+        string sketchesBasePath = Path.Combine(Application.persistentDataPath, "sketches");
+        string prevRunPath = sketchesBasePath + " run " + lastRun;
+        while (Directory.Exists(prevRunPath))
+        {
+            lastRun++;
+            prevRunPath = sketchesBasePath + " run " + lastRun;
+        }
+        // Move the old sketches folder if it exists
+        if (Directory.Exists(sketchesBasePath))
+        {
+            Directory.Move(sketchesBasePath, prevRunPath);
+        }
+        // Find a free run number for the new session
+        while (Directory.Exists(sketchesBasePath + " run " + nextRun))
+        {
+            nextRun++;
+        }
+        _run = nextRun;
         PlayerPrefs.SetInt("run", _run);
+        PlayerPrefs.Save();
+        // Create a new safe folder for sketches
+        Directory.CreateDirectory(sketchesBasePath);
 
         // Unlock the first spell button and lock the others
         if (UIManager.Instance.PlayerUI != null && UIManager.Instance.PlayerUI.SpellButtons != null)
@@ -223,5 +247,8 @@ public class GameManager : Singleton<GameManager>
         UIManager.Instance.OpenMenuCanvas();
 
         Debug.Log("Game reset");
+
+        // Start the game sequence immediately after reset
+        StartCoroutine(StartGameSequence());
     }
 }

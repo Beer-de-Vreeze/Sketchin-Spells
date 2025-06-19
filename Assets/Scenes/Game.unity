@@ -3066,6 +3066,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 3a96a7c9543ed0a40bda73f98a9f1a14, type: 2}
   - {fileID: 11400000, guid: fb1d50c2d74fb8f41af9740f83cc864f, type: 2}
   CurrentWaveIndex: 0
+  spawnPoint: {fileID: 6468303448234022838, guid: 67f6462f003302346982e43a58b79898, type: 3}
 --- !u!4 &1886487324
 Transform:
   m_ObjectHideFlags: 0

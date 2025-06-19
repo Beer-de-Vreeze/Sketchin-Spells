@@ -6,10 +6,4 @@ using UnityEngine;
 public class Wave : ScriptableObject
 {
     public GameObject Enemy;
-    public Transform SpawnPoint;
-
-    private void Start()
-    {
-        SpawnPoint = GameObject.Find("Transform").transform;
-    }
 }
