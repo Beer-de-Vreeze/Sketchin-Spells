@@ -15,18 +15,25 @@ public class EnemyHealthManagerSO : HealthManagerSO
     public override void OnEnable()
     {
         CurrentHealth = MaxHealth;
-        if (healthChangedEvent == null)
+        if (EnemyHealthChangedEvent == null)
         {
             EnemyHealthChangedEvent = new UnityEvent<int>();
+        }
+        // Also initialize the base health event
+        if (healthChangedEvent == null)
+        {
+            healthChangedEvent = new UnityEvent<int>();
         }
     }
 
     public override void DamageOverTime(int damage, int duration)
     {
-        for (int i = 0; i < duration; i++)
-        {
-            TakeDamage(damage);
-        }
+        // For now, just apply the base damage once
+        // TODO: Implement proper damage over time with coroutines
+        TakeDamage(damage);
+        Debug.Log(
+            $"DamageOverTime called with {damage} damage for {duration} duration - applying {damage} damage once for now"
+        );
     }
 
     public override void Heal(int amount)
@@ -41,9 +48,25 @@ public class EnemyHealthManagerSO : HealthManagerSO
 
     public override void TakeDamage(int damage)
     {
+        // Validate damage input
+        if (damage < 0)
+        {
+            Debug.LogWarning("Negative damage value received: " + damage + ". Using 0 instead.");
+            damage = 0;
+        }
+
         CurrentHealth -= damage;
+
+        // Ensure health doesn't go below 0
+        if (CurrentHealth < 0)
+        {
+            CurrentHealth = 0;
+        }
+
+        // Invoke both events for compatibility
         EnemyHealthChangedEvent.Invoke(CurrentHealth);
-        Debug.Log("Health: " + CurrentHealth + name);
+        healthChangedEvent.Invoke(CurrentHealth);
+        Debug.Log("Enemy Health: " + CurrentHealth + "/" + MaxHealth + " (" + name + ")");
     }
 
     public override void SetMaxHealth(int amount)

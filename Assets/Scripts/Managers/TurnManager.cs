@@ -73,6 +73,14 @@ public class TurnManager : Singleton<TurnManager>
         OnPlayerTurnStart.AddListener(StartPlayerTurn);
         OnPlayerTurnEnd.AddListener(EndPlayerTurn);
         OnEnemyTurnEnd.AddListener(HandleEnemyTurnEnd);
+
+        // Ensure the current enemy is set as the target for player spells
+        if (CurrentEnemy != null && UIManager.Instance.PlayerUI != null)
+        {
+            UIManager.Instance.PlayerUI.SetTarget(CurrentEnemy.gameObject);
+            Debug.Log($"Set target to {CurrentEnemy.name} for battle");
+        }
+
         StartPlayerTurn();
     }
 

@@ -16,6 +16,5 @@ public class EnemySO : ScriptableObject
     public void Cast(GameObject caster, GameObject target)
     {
         Attack.ApplySpellEffect(caster, target);
-        TurnManager.Instance.EndEnemyTurn();
     }
 }

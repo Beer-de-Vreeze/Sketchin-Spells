@@ -22,17 +22,33 @@ public class HealthManagerSO : ScriptableObject
 
     public virtual void TakeDamage(int damage)
     {
+        // Validate damage input
+        if (damage < 0)
+        {
+            Debug.LogWarning("Negative damage value received: " + damage + ". Using 0 instead.");
+            damage = 0;
+        }
+
         CurrentHealth -= damage;
+
+        // Ensure health doesn't go below 0
+        if (CurrentHealth < 0)
+        {
+            CurrentHealth = 0;
+        }
+
         healthChangedEvent.Invoke(CurrentHealth);
-        Debug.Log("Health: " + CurrentHealth + name);
+        Debug.Log("Health: " + CurrentHealth + "/" + MaxHealth + " (" + name + ")");
     }
 
     public virtual void DamageOverTime(int damage, int duration)
     {
-        for (int i = 0; i < duration; i++)
-        {
-            TakeDamage(damage);
-        }
+        // For now, just apply the base damage once
+        // TODO: Implement proper damage over time with coroutines
+        TakeDamage(damage);
+        Debug.Log(
+            $"DamageOverTime called with {damage} damage for {duration} duration - applying {damage} damage once for now"
+        );
     }
 
     public virtual void Heal(int amount)

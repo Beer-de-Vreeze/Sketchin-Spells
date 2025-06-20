@@ -83,10 +83,14 @@ public class SpellButton : MonoBehaviour
             {
                 if (player.Mana.CurrentMana >= Spell.SpellData.ManaCost)
                 {
-                    UIManager.Instance.PlayerUI.CastSpell(Spell, UIManager.Instance.PlayerUI.Target);
-                    player.Mana.CurrentMana -= Spell.SpellData.ManaCost;
-                    player.Mana.ManaChangedEvent.Invoke(player.Mana.CurrentMana);
-                    Debug.Log($"Casting spell: {Spell.SpellData.SpellName}, Type: {Spell.SpellData.SpellType}");
+                    // Only call PlayerUI.CastSpell - it handles mana deduction internally
+                    UIManager.Instance.PlayerUI.CastSpell(
+                        Spell,
+                        UIManager.Instance.PlayerUI.Target
+                    );
+                    Debug.Log(
+                        $"Casting spell: {Spell.SpellData.SpellName}, Type: {Spell.SpellData.SpellType}"
+                    );
                 }
                 else
                 {

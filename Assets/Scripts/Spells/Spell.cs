@@ -47,10 +47,11 @@ public class Spell : MonoBehaviour
                 return;
             }
         }
-
         Debug.Log(
             $"Applying spell effect to {target.name} from {caster.name} with {SpellData.SpellName} dealing {SpellData.Damage} damage."
         );
+        Debug.Log($"Target has tag: {target.tag}, SpellType: {SpellData.SpellType}");
+
         switch (SpellData.SpellType)
         {
             case SpellType.Projectile:
@@ -59,8 +60,17 @@ public class Spell : MonoBehaviour
                     Enemy enemy = target.GetComponent<Enemy>();
                     if (enemy != null)
                     {
+                        Debug.Log(
+                            $"Enemy found! Current health: {enemy.Health.CurrentHealth}, Taking {SpellData.Damage} damage"
+                        );
                         enemy.Health.TakeDamage(SpellData.Damage);
-                        Debug.Log($"Dealt {SpellData.Damage} damage to {target.name}");
+                        Debug.Log(
+                            $"Dealt {SpellData.Damage} damage to {target.name}. New health: {enemy.Health.CurrentHealth}"
+                        );
+                    }
+                    else
+                    {
+                        Debug.LogError($"Enemy component not found on {target.name}");
                     }
                 }
                 else if (target.CompareTag("Player"))
@@ -71,6 +81,10 @@ public class Spell : MonoBehaviour
                         player.Health.TakeDamage(SpellData.Damage);
                         Debug.Log($"Dealt {SpellData.Damage} damage to {target.name}");
                     }
+                }
+                else
+                {
+                    Debug.LogError($"Target {target.name} has unexpected tag: {target.tag}");
                 }
                 break;
             case SpellType.Heal:
@@ -96,9 +110,8 @@ public class Spell : MonoBehaviour
             default:
                 break;
         }
-    }
+    } //make an attack animation for the spell
 
-    //make an attack animation for the spell
     public void AnimateProjectileSpell(GameObject caster, GameObject target)
     {
         if (caster == null || target == null)
@@ -106,7 +119,19 @@ public class Spell : MonoBehaviour
             Debug.LogError("Caster or target is null");
             return;
         }
-        StartCoroutine(ProjectileAnimationCoroutine(caster, target));
+        // Start the coroutine from an active GameObject (UIManager or GameManager)
+        if (UIManager.Instance != null)
+        {
+            UIManager.Instance.StartCoroutine(ProjectileAnimationCoroutine(caster, target));
+        }
+        else if (GameManager.Instance != null)
+        {
+            GameManager.Instance.StartCoroutine(ProjectileAnimationCoroutine(caster, target));
+        }
+        else
+        {
+            Debug.LogError("No active GameObject found to start coroutine");
+        }
     }
 
     private IEnumerator ProjectileAnimationCoroutine(GameObject caster, GameObject target)
@@ -140,11 +165,26 @@ public class Spell : MonoBehaviour
             Debug.LogError("Caster or target is null");
             return;
         }
-        StartCoroutine(HealAnimationCoroutine(caster, target));
+        // Start the coroutine from an active GameObject (UIManager or GameManager)
+        if (UIManager.Instance != null)
+        {
+            UIManager.Instance.StartCoroutine(HealAnimationCoroutine(caster, target));
+        }
+        else if (GameManager.Instance != null)
+        {
+            GameManager.Instance.StartCoroutine(HealAnimationCoroutine(caster, target));
+        }
+        else
+        {
+            Debug.LogError("No active GameObject found to start coroutine");
+        }
     }
 
     private IEnumerator HealAnimationCoroutine(GameObject caster, GameObject target)
     {
+        // Apply the heal effect immediately before starting the animation
+        ApplySpellEffect(caster, target);
+
         GameObject spellInstance = Instantiate(
             gameObject,
             target.transform.position,
@@ -168,7 +208,6 @@ public class Spell : MonoBehaviour
             yield return null;
         }
         spellInstance.transform.localScale = endScale;
-        ApplySpellEffect(spellInstance, target);
         Destroy(spellInstance, 0.5f);
     }
 

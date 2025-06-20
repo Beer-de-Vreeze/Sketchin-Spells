@@ -5,6 +5,7 @@ using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class GameManager : Singleton<GameManager>
@@ -76,13 +77,12 @@ public class GameManager : Singleton<GameManager>
             Player.PlayerDescription
         );
         Player.LoadSprite();
-        UIManager.Instance.OpenGameCanvas();
-
-        // Start the second dialogue and sketching sequence
+        UIManager.Instance.OpenGameCanvas(); // Start the second dialogue and sketching sequence
         WaveManager.Instance.SpawnEnemy(0);
         Debug.Log("Waiting for enemy to spawn");
         Enemy enemy = TurnManager.Instance.CurrentEnemy;
         yield return new WaitUntil(() => enemy != null);
+
         yield return StartDialogueAndSketch(
             2,
             SketchType.Enemy,
@@ -178,6 +178,7 @@ public class GameManager : Singleton<GameManager>
     [ContextMenu("Reset Game")]
     public void ResetGame()
     {
+        // Increment run number and save sketches before reloading
         _run++;
         string path = Path.Combine(Application.persistentDataPath, "sketches");
         string newPath = path + " run " + _run;
@@ -199,56 +200,9 @@ public class GameManager : Singleton<GameManager>
         PlayerPrefs.SetInt("run", _run);
         PlayerPrefs.Save();
 
-        // Reset player
-        Player.Reset();
+        Debug.Log("Game reset - reloading scene");
 
-        // Reset spell buttons
-        foreach (Button button in UIManager.Instance.PlayerUI.SpellButtons)
-        {
-            button.GetComponent<SpellButton>().Reset();
-        }
-
-        // Destroy existing enemy
-        GameObject existingEnemy = GameObject.Find("Enemy(Clone)");
-        if (existingEnemy != null)
-        {
-            Destroy(existingEnemy);
-        }
-
-        // Reset other managers
-        WaveManager.Instance.ResetWaveManager();
-        UIManager.Instance.ResetUIManager();
-        TurnManager.Instance.ResetTurnManager();
-
-        // Reinitialize UI
-        if (UIManager.Instance.PlayerUI != null && UIManager.Instance.PlayerUI.SpellButtons != null)
-        {
-            for (int i = 0; i < UIManager.Instance.PlayerUI.SpellButtons.Count; i++)
-            {
-                SpellButton spellButton = UIManager
-                    .Instance.PlayerUI.SpellButtons[i]
-                    .GetComponent<SpellButton>();
-                if (spellButton != null)
-                {
-                    if (i == 0)
-                    {
-                        spellButton.UnlockSpell();
-                    }
-                    else
-                    {
-                        spellButton.Reset();
-                    }
-                }
-            }
-        }
-
-        // Go back to menu canvas
-        UIManager.Instance.CloseAllCanvas();
-        UIManager.Instance.OpenMenuCanvas();
-
-        Debug.Log("Game reset");
-
-        // Start the game sequence immediately after reset
-        StartCoroutine(StartGameSequence());
+        // Reload the current scene
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }

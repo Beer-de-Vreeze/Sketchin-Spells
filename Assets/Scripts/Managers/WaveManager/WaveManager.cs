@@ -13,16 +13,31 @@ public class WaveManager : Singleton<WaveManager>
             Wave wave = Waves[waveIndex];
             if (wave != null && wave.Enemy != null && spawnPoint != null)
             {
-                Instantiate(
+                GameObject enemyObj = Instantiate(
                     wave.Enemy,
                     spawnPoint.position,
                     Quaternion.identity,
                     parent: UIManager.Instance.GameCanvas.transform
                 );
-                //find the enemy in the scene
-                TurnManager.Instance.SetCurrentEnemy(
-                    UIManager.Instance.GameCanvas.GetComponentInChildren<Enemy>()
-                );
+                //find the enemy in the scene and set it as current enemy
+                Enemy enemy = UIManager.Instance.GameCanvas.GetComponentInChildren<Enemy>();
+
+                // Ensure the enemy has the correct tag
+                if (enemy != null && enemy.gameObject != null)
+                {
+                    enemy.gameObject.tag = "Enemy";
+                    Debug.Log($"Set {enemy.name} tag to 'Enemy'");
+                }
+
+                TurnManager.Instance.SetCurrentEnemy(enemy);
+
+                // Ensure the enemy is set as the player's target
+                if (UIManager.Instance.PlayerUI != null && enemy != null)
+                {
+                    UIManager.Instance.PlayerUI.SetTarget(enemy.gameObject);
+                    Debug.Log($"Spawned enemy: {enemy.name} and set as target");
+                }
+
                 CurrentWaveIndex++;
             }
         }

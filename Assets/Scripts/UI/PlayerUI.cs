@@ -17,21 +17,36 @@ public class PlayerUI : MonoBehaviour
         EndTurnButton = GetComponentInChildren<Button>();
         foreach (Button button in SpellButtons)
         {
-            button.onClick.AddListener(
-                () => CastSpell(button.GetComponent<SpellButton>().Spell, Target)
-            );
+            // Use the SpellButton's CastSpell method instead of directly calling CastSpell
+            SpellButton spellButton = button.GetComponent<SpellButton>();
+            if (spellButton != null)
+            {
+                button.onClick.AddListener(() => spellButton.CastSpell());
+            }
         }
     }
 
     public void CastSpell(Spell spell, GameObject target)
     {
+        Debug.Log(
+            $"CastSpell called - Spell: {(spell ? spell.SpellData.SpellName : "null")}, Target: {(target ? target.name : "null")}"
+        );
+
         if (spell != null && target != null)
         {
             Player player = GameManager.Instance.Player?.GetComponent<Player>();
             if (player != null && player.Mana != null)
             {
+                Debug.Log(
+                    $"Player mana: {player.Mana.CurrentMana}/{player.Mana.MaxMana}, Spell cost: {spell.SpellData.ManaCost}"
+                );
+
                 if (player.Mana.CurrentMana >= spell.SpellData.ManaCost)
                 {
+                    Debug.Log(
+                        $"Casting {spell.SpellData.SpellName} ({spell.SpellData.SpellType}) on {target.name} for {spell.SpellData.Damage} damage"
+                    );
+
                     if (spell.SpellData.SpellType == SpellType.Projectile)
                     {
                         spell.AnimateProjectileSpell(this.gameObject, target); // Use animation
